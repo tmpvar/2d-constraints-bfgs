@@ -23,7 +23,7 @@ function nvec(width) {
   return c;
 }
 
-function calc(constraints, store) {
+function calc(constraints, components) {
   var val = 0;
   var l = constraints.length;
   var where = 0;
@@ -31,7 +31,7 @@ function calc(constraints, store) {
   for (i=0; i<constraints.length; i++) {
     var constraint = constraints[i];
     var size = constraint.size;
-    var args = store.slice(where, size);
+    var args = components.slice(where, size);
     val += constraints[i][0].apply(null, args);
     where += size;
   }
@@ -52,6 +52,15 @@ function solve(constraints) {
 
   // TODO: come up with a better way extract/backfill values
   var components = [];
+  var fixedComponents = [];
+
+  function setComponent(idx, value) {
+    if (fixedComponents[idx]) {
+      return;
+    } else {
+      components[idx] = value;
+    }
+  }
 
   // turn the nested constraint component values into a 1d array
   for (i=0; i<constraints.length; i++) {
@@ -65,7 +74,7 @@ function solve(constraints) {
 
   // perform a baseline compute using the incoming components
   var f0 = calc(constraints, components);
-debug('---------\n')
+  debug('---------\n')
   if (f0 < EPS/2) {
     // return immediately if already stable
     return true;
@@ -80,11 +89,11 @@ debug('---------\n')
   for (i=0; i<l; i++) {
     var original = components[i];
 
-    components[i] = original - perturbValue;
+    setComponent(i, original - perturbValue);
     debug('sub: %s - %s = %s', original, perturbValue, components[i])
     var first = calc(constraints, components);
 
-    components[i] = original + perturbValue;
+    setComponent(i, original + perturbValue);
     var second = calc(constraints, components);
 
     debug('perturb: %s - %s', first, second);
@@ -93,7 +102,7 @@ debug('---------\n')
     debug('gradient[%s] = %s', i, gradient[i]);
 
     // reset components back to the orig
-    components[i] = original;
+    setComponent(i, original);
     gradientNormal += (gradient[i] * gradient[i]);
   }
 
@@ -125,6 +134,7 @@ debug('---------\n')
   var alpha = 1;
   var componentsCopy = components.slice();
   var fnew = lineSearch(
+    setComponent,
     components,
     alpha,
     f0,
@@ -188,14 +198,14 @@ debug('---------\n')
     for(i=0; i<l; i++) {
       //Calculate the new gradient vector
       var oldParamValue = components[i];
-      components[i] = oldParamValue - perturbValue;
+      setComponent(i, oldParamValue - perturbValue);
       first = calc(constraints, components);
-      components[i] = oldParamValue + perturbValue;
+      setComponent(i, oldParamValue + perturbValue);
 
       second= calc(constraints, components);
       gradnew[i]=.5 * (second - first) / perturbValue;
 
-      components[i] = oldParamValue;
+      setComponent(i, oldParamValue);
       //Calculate the change in the gradient
       gamma[i] = gradnew[i] - gradient[i];
       bottom += deltaX[i] * gamma[i];
@@ -271,11 +281,12 @@ debug('---------\n')
 
     //copy newest values to the componentsCopy
     for(i=0;i<l;i++) {
-      componentsCopy[i]=components[i];//Copy last values to componentsCopy
+      componentsCopy[i] = components[i];//Copy last values to componentsCopy
     }
     steps=0;
 
     fnew = lineSearch(
+      setComponent,
       components,
       alpha,
       fnew,
@@ -288,7 +299,7 @@ debug('---------\n')
   }
 
   components.map(function(c, i) {
-    debug('Parameter(%s): %s', i, c);
+    console.log('Parameter(%s): %s', i, c);
   })
 
   debug("Fnew: %s", fnew);

@@ -52,10 +52,10 @@ verticalConstraint.inject = function(orig, values) {
 constraints.pointOnPoint = pointOnPoint;
 
 function pointOnPoint(x1, y1, x2, y2) {
-  var pdx = x1 - x2;
-  var pdy = y1 - y2;
+  var dx = x1 - x2;
+  var dy = y1 - y2;
 
-  return pdx * pdx + pdy * pdy;
+  return dx * dx + dy * dy;
 }
 
 pointOnPoint.size = 4;
@@ -76,27 +76,49 @@ pointOnPoint.inject = function(orig, values) {
   orig[1][1] = values[3];
 }
 
+constraints.fixed = fixed;
+
+function fixed(px, py, ox, oy) {
+  return 0;
+  var dx = px - ox;
+  var dy = py - oy;
+
+  return dx * dx + dy * dy;
+}
+
+fixed.size = 2;
+
+fixed.extract = function(args) {
+  return args[0];
+}
+
+fixed.inject = function(orig, values) {
+  console.log('INJECT', orig, values)
+  // NOOP: you can't change me sucka!!!
+  orig[0] = values[0];
+  orig[1] = values[1];
+}
+
 constraints.pointOnLine = pointOnLine;
 
-function pointOnLine(x1, y1, x2, y2) {
-// dx = L1_P2_x - L1_P1_x;
-//       dy = L1_P2_y - L1_P1_y;
+function pointOnLine(px, py, x1, y1, x2, y2) {
+  var dx = x2 - x1;
+  var dy = y2 - y1;
 
-//       m=dy/dx; //Slope
-//       n=dx/dy; //1/Slope
+  var m = dy / dx; //Slope
+  var n = dx / dy; //1/Slope
 
-//       if(m<=1 && m>=-1) {
-//         //Calculate the expected y point given the x coordinate of the point
-//         Ey=L1_P1_y+m*(P1_x-L1_P1_x);
-//         error+=(Ey-P1_y)*(Ey-P1_y);
-//       }
-//       else
-//       {
-//         //Calculate the expected x point given the y coordinate of the point
-//         Ex=L1_P1_x+n*(P1_y-L1_P1_y);
-//         error+=(Ex-P1_x)*(Ex-P1_x);
-//       }
-
+  if(m<=1 && m>=-1) {
+    //Calculate the expected y point given the x coordinate of the point
+    var y = y1 + m * (px - x1);
+    var yd = y - py;
+    return yd * yd;
+  } else {
+    //Calculate the expected x point given the y coordinate of the point
+    var x = x1+ n * (py - y1);
+    var xd = x - px
+    return xd * xd;
+  }
 }
 
 pointOnLine.size = 6;

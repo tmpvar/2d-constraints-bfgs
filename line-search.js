@@ -2,9 +2,9 @@ module.exports = lineSearch
 
 var debug = process.env.DEBUG ? console.log : function() {};
 
-function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, calc) {
+function lineSearch(setComponent, components, alpha, f0, constraints, componentsCopy, searchVector, calc) {
 
-  var l = out.length;
+  var l = componentsCopy.length;
   debug("\n\n/// START OF LINE SEARCH");
   //Make the initial position alpha1
   var alpha1=0;
@@ -15,18 +15,18 @@ function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, c
   //Take a step of alpha=1 as alpha2
   var alpha2=1;
   for(var i=0;i<l;i++) {
-    out[i] = componentsCopy[i] + alpha2 * searchVector[i];//calculate the new x
+    setComponent(i, componentsCopy[i] + alpha2 * searchVector[i]);//calculate the new x
   }
 
-  var f2 = calc(constraints, out);
+  var f2 = calc(constraints, components);
   debug('f2: %s', f2);
 
   //Take a step of alpha 3 that is 2*alpha2
   var alpha3 = alpha*2;
   for(var i=0;i<l;i++) {
-    out[i] = componentsCopy[i] + alpha3 * searchVector[i]; //calculate the new x
+    setComponent(i, componentsCopy[i] + alpha3 * searchVector[i]); //calculate the new x
   }
-  var f3=calc(constraints, out);
+  var f3=calc(constraints, components);
   debug('f3: %s', f3);
 
 
@@ -43,10 +43,10 @@ function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, c
       f3=f2;
       alpha2=alpha2/2;
       for(var i=0; i<l; i++) {
-        out[i] = componentsCopy[i] + alpha2 * searchVector[i];
+        setComponent(i, componentsCopy[i] + alpha2 * searchVector[i]);
       }
 
-      f2 = calc(constraints, out);
+      f2 = calc(constraints, components);
     }
 
     else if(f2 > f3) {
@@ -56,9 +56,9 @@ function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, c
       f2 = f3;
       alpha3 = alpha3 * 2;
       for(var i=0;i<l;i++) {
-        out[i] = componentsCopy[i] + alpha3 * searchVector[i];
+        setComponent(i, componentsCopy[i] + alpha3 * searchVector[i]);
       }
-      f3 = calc(constraints, out);
+      f3 = calc(constraints, components);
     }
   }
 
@@ -76,10 +76,10 @@ function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, c
 
   /// Set the values to alphaStar
   for(var i=0; i<l; i++) {
-    out[i] = componentsCopy[i] + alphaStar * searchVector[i];
+    setComponent(i, componentsCopy[i] + alphaStar * searchVector[i]);
   }
 
-  var fnew=calc(constraints, out);
+  var fnew=calc(constraints, components);
 
   debug("F at alphaStar: ", fnew);
   debug("alphaStar: ", alphaStar);
