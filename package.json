@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "cwise": "^1.0.8",
     "tape": "^4.0.1"
   }
 }
