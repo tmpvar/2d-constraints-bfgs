@@ -12,13 +12,10 @@ function horizontalConstraint(y1, y2) {
 
 horizontalConstraint.size = 2;
 
-
-horizontalConstraint.extract = function(args) {
+horizontalConstraint.extract = function(args, addComponent) {
   var line = args[0];
-  return [
-    line[0][1],
-    line[1][1]
-  ];
+  addComponent(line[0], 1)
+  addComponent(line[1], 1)
 };
 
 horizontalConstraint.inject = function(orig, values) {
@@ -36,12 +33,10 @@ function verticalConstraint(x1, x2) {
 
 verticalConstraint.size = 2;
 
-verticalConstraint.extract = function(args) {
+verticalConstraint.extract = function(args, addComponent) {
   var line = args[0];
-  return [
-    line[0][0],
-    line[1][0]
-  ];
+  addComponent(line[0], 0)
+  addComponent(line[1], 0)
 };
 
 verticalConstraint.inject = function(orig, values) {
@@ -59,13 +54,11 @@ function pointOnPoint(x1, y1, x2, y2) {
 }
 
 pointOnPoint.size = 4;
-pointOnPoint.extract = function(args) {
-  return [
-    args[0][0],
-    args[0][1],
-    args[1][0],
-    args[1][1],
-  ];
+pointOnPoint.extract = function(args, addComponent) {
+  addComponent(args[0], 0);
+  addComponent(args[0], 1);
+  addComponent(args[1], 0);
+  addComponent(args[1], 1);
 };
 
 pointOnPoint.inject = function(orig, values) {
@@ -89,14 +82,11 @@ function fixed(px, py, ox, oy) {
 fixed.size = 2;
 
 fixed.extract = function(args) {
-  return args[0];
+  // NOOP: no need to add points
 }
 
 fixed.inject = function(orig, values) {
-  console.log('INJECT', orig, values)
   // NOOP: you can't change me sucka!!!
-  orig[0] = values[0];
-  orig[1] = values[1];
 }
 
 constraints.pointOnLine = pointOnLine;
@@ -122,19 +112,22 @@ function pointOnLine(px, py, x1, y1, x2, y2) {
 }
 
 pointOnLine.size = 6;
-pointOnLine.extract = function(args) {
+
+pointOnLine.extract = function(args, addComponent) {
   var point = args[0]
   var line = args[1];
   var a = line[0];
   var b = line[1];
-  return [
-    point[0],
-    point[1],
-    a[0],
-    a[1],
-    b[0],
-    b[1]
-  ];
+
+  addComponent(point[0], 0)
+  addComponent(point[0], 1)
+  addComponent(point[1], 0)
+  addComponent(point[1], 1)
+
+  addComponent(a, 0)
+  addComponent(a, 1)
+  addComponent(b, 0)
+  addComponent(b, 1)
 };
 
 pointOnLine.inject = function(args, values) {

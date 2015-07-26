@@ -50,7 +50,6 @@ var CONVERGENCE_FINE = 1e-10;
 function solve(constraints) {
   var l, i, j, k;
 
-  // TODO: come up with a better way extract/backfill values
   var components = [];
   var fixedComponents = [];
 
@@ -62,10 +61,38 @@ function solve(constraints) {
     }
   }
 
+  var fixedPoints = constraints.filter(function(a) {
+    return a[0].name === 'fixed';
+  }).map(function(a) {
+    // first component for identity test, second for
+    // a list of components affected.
+    return a[1][0];
+  })
+
+
   // turn the nested constraint component values into a 1d array
   for (i=0; i<constraints.length; i++) {
     var constraint = constraints[i];
-    Array.prototype.push.apply(components, constraint[0].extract(constraint[1]));
+    if (constraint[0].name === 'fixed') {
+      // skip fixed constraints
+      continue;
+    }
+    constraint[0].extract(constraint[1], function addComponent(point, key) {
+      // TODO: make this more efficient..
+      var r = fixedPoints.filter(function(a) {
+        if (a === point) {
+          return true;
+        }
+      })
+
+      if (r.length) {
+        fixedComponents.push(true);
+      } else {
+        fixedComponents.push(false);
+      }
+
+      components.push(point[key]);
+    });
   }
 
   // compenents can be thought of as the original n-dimensional vector
@@ -299,7 +326,7 @@ function solve(constraints) {
   }
 
   components.map(function(c, i) {
-    console.log('Parameter(%s): %s', i, c);
+    debug('Parameter(%s): %s', i, c);
   })
 
   debug("Fnew: %s", fnew);

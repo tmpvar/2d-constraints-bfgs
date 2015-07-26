@@ -12,7 +12,7 @@ function near(a, b) {
     return false;
   }
 }
-/*
+
 test('basic horizontal test', function(t) {
   var line = [
     [0, 0],
@@ -65,22 +65,19 @@ test('basic pointOnPoint test', function(t) {
   t.end();
 });
 
-*/
-test('basic fixed point', function(t) {
+test('basic pointOnPoint w/ fixed point', function(t) {
   var point1 = [0, 0];
-  var point2 = [0, .5];
+  var point2 = [1, 1];
 
   var pointOnPoint = [constraints.pointOnPoint, [point1, point2]];
   var fixed = [constraints.fixed, [point1]];
   var res = solve([pointOnPoint, fixed]);
 
-console.log(point1, point2);
-
   // t.ok(res, 'found a solution');
-  // t.ok(near(point1[0], 0.5), 'point1 x near 0');
-  // t.ok(near(point1[1], 0.5), 'point1 y near 0.5');
-  // t.ok(near(point2[0], 0.5), 'point2 x near 0');
-  // t.ok(near(point2[1], 0.5), 'point2 y near 0.5');
+  t.ok(near(point1[0], 0.0), 'point1 x near 0');
+  t.ok(near(point1[1], 0.0), 'point1 y near 0');
+  t.ok(near(point2[0], 0.0), 'point2 x near 0');
+  t.ok(near(point2[1], 0.0), 'point2 y near 0');
   t.end();
 });
 
