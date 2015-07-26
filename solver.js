@@ -198,9 +198,9 @@ debug('---------\n')
       components[i] = oldParamValue;
       //Calculate the change in the gradient
       gamma[i] = gradnew[i] - gradient[i];
-      bottom+=deltaX[i]*gamma[i];
+      bottom += deltaX[i] * gamma[i];
 
-      deltaXtDotGamma += deltaX[i]*gamma[i];
+      deltaXtDotGamma += deltaX[i] * gamma[i];
     }
     debug("deltaXtDotGamma: %s", deltaXtDotGamma);
     debug("bottom: %s", bottom);

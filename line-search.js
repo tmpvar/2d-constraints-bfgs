@@ -70,7 +70,7 @@ function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, c
     alphaStar = alpha2;
   }
 
-  if(alphaStar !== alphaStar) {
+  if(isNaN(alphaStar)) {
     alphaStar = .001;//Fix nan problem
   }
 
