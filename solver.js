@@ -2,6 +2,8 @@ module.exports = solve;
 
 var lineSearch = require('./line-search')
 
+var debug = process.env.DEBUG ? console.log : function() {};
+
 function squareMatrix(width) {
   var c = new Array(width);
   for (var i=0; i<width; i++) {
@@ -63,15 +65,15 @@ function solve(constraints) {
 
   // perform a baseline compute using the incoming components
   var f0 = calc(constraints, components);
-console.log('---------\n')
+debug('---------\n')
   if (f0 < EPS/2) {
     // return immediately if already stable
     return true;
   }
 
-  console.log('f0:', f0);
+  debug('f0:', f0);
   var perturbValue = f0 * PERTURB_MAGNITUDE;
-  console.log('perturbValue:', perturbValue)
+  debug('perturbValue:', perturbValue)
   var gradient = new Array(l);
   var gradientNormal = 0;
 
@@ -79,23 +81,23 @@ console.log('---------\n')
     var original = components[i];
 
     components[i] = original - perturbValue;
-    console.log('sub: %s - %s = %s', original, perturbValue, components[i])
+    debug('sub: %s - %s = %s', original, perturbValue, components[i])
     var first = calc(constraints, components);
 
     components[i] = original + perturbValue;
     var second = calc(constraints, components);
 
-    console.log('perturb: %s - %s', first, second);
+    debug('perturb: %s - %s', first, second);
 
     gradient[i] =  (.5 * (second - first)) / perturbValue;
-    console.log('gradient[%s] = %s', i, gradient[i]);
+    debug('gradient[%s] = %s', i, gradient[i]);
 
     // reset components back to the orig
     components[i] = original;
     gradientNormal += (gradient[i] * gradient[i]);
   }
 
-  console.log('gradientNormal:', gradientNormal);
+  debug('gradientNormal:', gradientNormal);
 
   var searchVector = new Array(l);
   var hessianInverse = new Array(l);
@@ -118,7 +120,7 @@ console.log('---------\n')
     }
   }
 
-  console.log('search vector:', searchVector.join(', '));
+  debug('search vector:', searchVector.join(', '));
 
   var alpha = 1;
   var componentsCopy = components.slice();
@@ -161,11 +163,11 @@ console.log('---------\n')
     deltaX[i] = components[i] - componentsCopy[i];
   }
 
-  console.log("deltaXnorm: ", deltaXnorm);
-  console.log("convergence: ", convergence);
-  console.log("fnew: ", fnew);
-  console.log("smallF: ", EPS);
-  console.log("maxIterNumber: ", iterations);
+  debug("deltaXnorm: ", deltaXnorm);
+  debug("convergence: ", convergence);
+  debug("fnew: ", fnew);
+  debug("smallF: ", EPS);
+  debug("maxIterNumber: ", iterations);
 
   while(
     deltaXnorm > convergence &&
@@ -200,8 +202,8 @@ console.log('---------\n')
 
       deltaXtDotGamma += deltaX[i]*gamma[i];
     }
-    console.log("deltaXtDotGamma: %s", deltaXtDotGamma);
-    console.log("bottom: %s", bottom);
+    debug("deltaXtDotGamma: %s", deltaXtDotGamma);
+    debug("bottom: %s", bottom);
 
 
     //make sure that bottom is never 0
@@ -283,15 +285,27 @@ console.log('---------\n')
       calc
     )
     iterations--;
-
   }
 
   components.map(function(c, i) {
-    console.log('Parameter(%s): %s', i, c);
+    debug('Parameter(%s): %s', i, c);
   })
 
-  console.log("Fnew: %s", fnew);
-  console.log("Number of Iterations: %s", (MAX_ITERATIONS - iterations) + 1)
+  debug("Fnew: %s", fnew);
+  debug("Number of Iterations: %s", (MAX_ITERATIONS - iterations) + 1)
+
+  // backfill the original entities
+  var cwhere = 0;
+  for (i=0; i<constraints.length; i++) {
+
+    var args = constraints[i];
+    var constraint = args[0];
+    var constraintSize = constraint.size;
+
+    constraint.inject(args[1], components.slice(cwhere, cwhere+constraintSize))
+    cwhere += constraintSize;
+  }
+
 
   return true;
 }

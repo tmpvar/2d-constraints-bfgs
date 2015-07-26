@@ -1,14 +1,15 @@
 module.exports = lineSearch
 
+var debug = process.env.DEBUG ? console.log : function() {};
 
 function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, calc) {
 
   var l = out.length;
-  console.log("\n\n/// START OF LINE SEARCH");
+  debug("\n\n/// START OF LINE SEARCH");
   //Make the initial position alpha1
   var alpha1=0;
   var f1 = f0;
-  console.log('f1: %s', f1);
+  debug('f1: %s', f1);
   // REMINDER! `s` is the negated nd vector
 
   //Take a step of alpha=1 as alpha2
@@ -18,7 +19,7 @@ function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, c
   }
 
   var f2 = calc(constraints, out);
-  console.log('f2: %s', f2);
+  debug('f2: %s', f2);
 
   //Take a step of alpha 3 that is 2*alpha2
   var alpha3 = alpha*2;
@@ -26,7 +27,7 @@ function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, c
     out[i] = componentsCopy[i] + alpha3 * searchVector[i]; //calculate the new x
   }
   var f3=calc(constraints, out);
-  console.log('f3: %s', f3);
+  debug('f3: %s', f3);
 
 
   // COMPUTE INTERVAL
@@ -80,17 +81,17 @@ function lineSearch(out, alpha, f0, constraints, componentsCopy, searchVector, c
 
   var fnew=calc(constraints, out);
 
-  console.log("F at alphaStar: ", fnew);
-  console.log("alphaStar: ", alphaStar);
-  console.log("F0: ", f0);
-  console.log("F1: ", f1);
-  console.log("F2: ", f2);
-  console.log("F3: ", f3);
-  console.log("Alpha1: ", alpha1);
-  console.log("Alpha2: ", alpha2);
-  console.log("Alpha3: ", alpha3);
+  debug("F at alphaStar: ", fnew);
+  debug("alphaStar: ", alphaStar);
+  debug("F0: ", f0);
+  debug("F1: ", f1);
+  debug("F2: ", f2);
+  debug("F3: ", f3);
+  debug("Alpha1: ", alpha1);
+  debug("Alpha2: ", alpha2);
+  debug("Alpha3: ", alpha3);
 
-  console.log("/// END OF LINE SEARCH\n");
+  debug("/// END OF LINE SEARCH\n");
 
   return fnew;
 }
