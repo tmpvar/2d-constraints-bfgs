@@ -31,3 +31,21 @@ test('basic horizontal test', function(t) {
   t.ok(near(line[1][1], 0.5), 'end y near 0.5');
   t.end();
 });
+
+test('basic vertical test', function(t) {
+  var line = [
+    [0, 0],
+    [1, 1]
+  ];
+
+  var vertical = [constraints.vertical, [line]];
+
+  var res = solve([vertical]);
+
+  t.ok(res, 'found a solution');
+  t.ok(near(line[0][0], 0.5), 'start x near 0');
+  t.ok(near(line[0][1], 0.0), 'start y near 0.5');
+  t.ok(near(line[1][0], 0.5), 'end x near 0');
+  t.ok(near(line[1][1], 1.0), 'end y near 0.5');
+  t.end();
+});
