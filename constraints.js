@@ -105,7 +105,7 @@ function pointOnLine(px, py, x1, y1, x2, y2) {
     return yd * yd;
   } else {
     //Calculate the expected x point given the y coordinate of the point
-    var x = x1+ n * (py - y1);
+    var x = x1 + n * (py - y1);
     var xd = x - px
     return xd * xd;
   }
@@ -119,10 +119,8 @@ pointOnLine.extract = function(args, addComponent) {
   var a = line[0];
   var b = line[1];
 
-  addComponent(point[0], 0)
-  addComponent(point[0], 1)
-  addComponent(point[1], 0)
-  addComponent(point[1], 1)
+  addComponent(point, 0)
+  addComponent(point, 1)
 
   addComponent(a, 0)
   addComponent(a, 1)
@@ -140,7 +138,7 @@ pointOnLine.inject = function(args, values) {
   point[1] = values[1];
 
   a[0] = values[2];
-  a[0] = values[3];
+  a[1] = values[3];
   b[0] = values[4];
-  b[0] = values[5];
+  b[1] = values[5];
 }
