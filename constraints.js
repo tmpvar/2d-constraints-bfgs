@@ -20,7 +20,6 @@ constraints.horizontal = horizontalConstraint;
 
 function horizontalConstraint(y1, y2) {
   var ydiff = y2 - y1;
-  debug('calc: %s - %s = %s', y2, y1, ydiff);
   return ydiff * ydiff * 1000;
 }
 
@@ -41,7 +40,6 @@ constraints.vertical = verticalConstraint;
 
 function verticalConstraint(x1, x2) {
   var xdiff = x2 - x1;
-  debug('calc: %s - %s = %s', x2, x1, xdiff);
   return xdiff * xdiff * 1000;
 }
 
