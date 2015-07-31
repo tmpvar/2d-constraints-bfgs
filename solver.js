@@ -31,8 +31,7 @@ function calc(constraints, components) {
   for (i=0; i<constraints.length; i++) {
     var constraint = constraints[i];
     var size = constraint.size;
-    var args = components.slice(where, size);
-    val += constraints[i][0].apply(null, args);
+    val += constraints[i][0].apply(null, constraints[i][2]);
     where += size;
   }
 
@@ -47,52 +46,89 @@ var EPS = 1e-20;
 var CONVERGENCE_ROUGH = 1e-8;
 var CONVERGENCE_FINE = 1e-10;
 
-function solve(constraints) {
-  var l, i, j, k;
+// TODO: make this handle addition/removal of constraints
+function ConstraintManager(constraints) {
 
-  var components = [];
-  var fixedComponents = [];
-
-  function setComponent(idx, value) {
-    if (fixedComponents[idx]) {
-      return;
-    } else {
-      components[idx] = value;
+  // pre-compute the fixed points
+  var toSolve = [];
+  this.fixedPoints = constraints.filter(function(a) {
+    var isFixed = a[0].name === 'fixed';
+    if (!isFixed) {
+      toSolve.push(a)
     }
-  }
-
-  var fixedPoints = constraints.filter(function(a) {
-    return a[0].name === 'fixed';
+    return isFixed;
   }).map(function(a) {
     // first component for identity test, second for
     // a list of components affected.
     return a[1][0];
-  })
+  });
 
 
-  // turn the nested constraint component values into a 1d array
-  for (i=0; i<constraints.length; i++) {
-    var constraint = constraints[i];
-    if (constraint[0].name === 'fixed') {
-      // skip fixed constraints
-      continue;
-    }
-    constraint[0].extract(constraint[1], function addComponent(point, key) {
+  var that = this;
+  this.components = [];
+  this.constraints = toSolve.map(function(constraint) {
+    var fn = constraint[0]
+    var args = constraint[1];
+    var variables = [];
+
+    fn.extract(constraint[1], function addComponent(point, key) {
       // TODO: make this more efficient..
-      var r = fixedPoints.filter(function(a) {
+      var r = that.fixedPoints.filter(function(a) {
         if (a === point) {
           return true;
         }
       })
 
-      if (r.length) {
-        fixedComponents.push(true);
-      } else {
-        fixedComponents.push(false);
-      }
+      var constant = typeof key === 'undefined'
+      var value = (constant) ? point : point[key];
 
-      components.push(point[key]);
+      if (r.length || constant) {
+        variables.push(value);
+      } else {
+        var valueIndex = that.components.length;
+        variables.push({
+          valueOf: function() {
+            return that.components[valueIndex]
+          }
+        })
+        that.components.push(value);
+      }
     });
+
+
+    if (fn.name !== 'fixed') {
+      that.components.push()
+    } else {
+
+    }
+
+    constraint.push(variables);
+
+    return constraint
+  });
+}
+
+ConstraintManager.prototype.sync = function() {
+  var constraints = this.constraints;
+  var l = constraints.length;
+
+  for (var i=0; i<l; i++) {
+    var constraint = constraints[i];
+    var fn = constraint[0];
+    var orig = constraint[1];
+    var vars = constraint[2];
+    fn.inject(orig, vars.map(function(v) { return v+0 }));
+  }
+}
+
+
+function solve(constraints) {
+  var manager = new ConstraintManager(constraints);
+
+  var l, i, j, k;
+  var components = manager.components
+  function setComponent(idx, value) {
+    components[idx] = value;
   }
 
   // compenents can be thought of as the original n-dimensional vector
@@ -333,17 +369,7 @@ function solve(constraints) {
   debug("Number of Iterations: %s", (MAX_ITERATIONS - iterations) + 1)
 
   // backfill the original entities
-  var cwhere = 0;
-  for (i=0; i<constraints.length; i++) {
-
-    var args = constraints[i];
-    var constraint = args[0];
-    var constraintSize = constraint.size;
-
-    constraint.inject(args[1], components.slice(cwhere, cwhere+constraintSize))
-    cwhere += constraintSize;
-  }
-
+  manager.sync();
 
   return true;
 }

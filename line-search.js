@@ -18,7 +18,7 @@ function lineSearch(setComponent, components, alpha, f0, constraints, components
     setComponent(i, componentsCopy[i] + alpha2 * searchVector[i]);//calculate the new x
   }
 
-  var f2 = calc(constraints, components);
+  var f2 = calc(constraints);
   debug('f2: %s', f2);
 
   //Take a step of alpha 3 that is 2*alpha2
@@ -26,7 +26,7 @@ function lineSearch(setComponent, components, alpha, f0, constraints, components
   for(var i=0;i<l;i++) {
     setComponent(i, componentsCopy[i] + alpha3 * searchVector[i]); //calculate the new x
   }
-  var f3=calc(constraints, components);
+  var f3=calc(constraints);
   debug('f3: %s', f3);
 
 
@@ -46,7 +46,7 @@ function lineSearch(setComponent, components, alpha, f0, constraints, components
         setComponent(i, componentsCopy[i] + alpha2 * searchVector[i]);
       }
 
-      f2 = calc(constraints, components);
+      f2 = calc(constraints);
     }
 
     else if(f2 > f3) {
@@ -58,7 +58,7 @@ function lineSearch(setComponent, components, alpha, f0, constraints, components
       for(var i=0;i<l;i++) {
         setComponent(i, componentsCopy[i] + alpha3 * searchVector[i]);
       }
-      f3 = calc(constraints, components);
+      f3 = calc(constraints);
     }
   }
 
@@ -79,7 +79,7 @@ function lineSearch(setComponent, components, alpha, f0, constraints, components
     setComponent(i, componentsCopy[i] + alphaStar * searchVector[i]);
   }
 
-  var fnew=calc(constraints, components);
+  var fnew = calc(constraints);
 
   debug("F at alphaStar: ", fnew);
   debug("alphaStar: ", alphaStar);

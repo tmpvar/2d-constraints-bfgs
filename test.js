@@ -144,3 +144,29 @@ test('basic pointOnLine test with fixed points', function(t) {
   ], 'line did not move')
   t.end();
 });
+
+test('basic internalAngle test with fixed points', function(t) {
+  var line1 = [[0, 0], [1, 0]];
+  var line2 = [[0, 0], [1, 1]];
+
+
+  // var pointOnPoint = [constraints.pointOnPoint, [line[0], line2[0]]];
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+  var l1p1Fixed = [constraints.fixed, [line1[1]]];
+  var l2p0Fixed = [constraints.fixed, [line2[0]]];
+
+  var internalAngle = [constraints.internalAngle, [Math.PI/2, line1, line2]]
+
+  var res = solve([l2p0Fixed, l1p0Fixed, l1p1Fixed, internalAngle]);
+
+  t.ok(res, 'found a solution');
+
+  t.deepEqual(line1, [[0, 0], [1, 0]], 'line1 did not move')
+  t.deepEqual(line2[0], [0, 0], 'line2.start did not move')
+  t.equal(line2[1][1], 1, 'line2.end.y did not move')
+  t.ok(near(line2[1][0], 0), 'line2.end.x is near 0')
+
+  t.end();
+});
+
+

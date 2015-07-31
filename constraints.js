@@ -1,6 +1,20 @@
 var constraints = module.exports = {};
 
 var debug = process.env.DEBUG ? console.log : function() {};
+var cos = Math.cos;
+
+function hypot() {
+  var y = 0;
+  var length = arguments.length;
+
+  for (var i = 0; i < length; i++) {
+    if (arguments[i] === Infinity || arguments[i] === -Infinity) {
+      return Infinity;
+    }
+    y += arguments[i] * arguments[i];
+  }
+  return Math.sqrt(y);
+}
 
 constraints.horizontal = horizontalConstraint;
 
@@ -79,7 +93,7 @@ function fixed(px, py, ox, oy) {
   return dx * dx + dy * dy;
 }
 
-fixed.size = 2;
+fixed.size = 0;
 
 fixed.extract = function(args) {
   // NOOP: no need to add points
@@ -141,4 +155,68 @@ pointOnLine.inject = function(args, values) {
   a[1] = values[3];
   b[0] = values[4];
   b[1] = values[5];
+}
+
+module.exports.internalAngle = internalAngle;
+
+function internalAngle(angle, l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
+  var d1x = l1ex - l1sx;
+  var d1y = l1ey - l1sy;
+  var d2x = l2ex - l2sx;
+  var d2y = l2ey - l2sy;
+
+  var hyp1 = hypot(d1x, d1y);
+  var hyp2 = hypot(d2x, d2y);
+
+  var d1x = d1x / hyp1;
+  var d1y = d1y / hyp1;
+  var dx2 = d2x / hyp2;
+  var dy2 = d2y / hyp2;
+
+  var temp = d1x * d2x + d1y * d2y;
+  var temp2 = cos(angle);
+
+  return (temp + temp2) * (temp + temp2);
+}
+
+internalAngle.size = 9;
+
+internalAngle.extract = function(args, addComponent) {
+  var angle = args[0];
+  var line1 = args[1];
+  var line2 = args[2];
+  var a = line1[0];
+  var b = line1[1];
+  var c = line2[0];
+  var d = line2[1];
+
+  addComponent(angle);
+  addComponent(a, 0);
+  addComponent(a, 1);
+  addComponent(b, 0);
+  addComponent(b, 1);
+  addComponent(c, 0);
+  addComponent(c, 1);
+  addComponent(d, 0);
+  addComponent(d, 1);
+};
+
+internalAngle.inject = function(args, values) {
+  var angle = args[0];
+  var line1 = args[1];
+  var line2 = args[2];
+  var a = line1[0];
+  var b = line1[1];
+  var c = line2[0];
+  var d = line2[1];
+
+  args[0] = values[0];
+  a[0] = values[1];
+  a[1] = values[2];
+  b[0] = values[3];
+  b[1] = values[4];
+  c[0] = values[5];
+  c[1] = values[6];
+  d[0] = values[7];
+  d[1] = values[8];
 }
