@@ -1,5 +1,5 @@
 var test = require('tape');
-var solve = require('./solver');
+var createSolver = require('./solver');
 var constraints = require('./constraints');
 
 var EPS = 1e-9;
@@ -21,7 +21,7 @@ test('basic horizontal test', function(t) {
 
   var horizontal = [constraints.horizontal, [line]];
 
-  var res = solve([horizontal]);
+  var res = createSolver([horizontal]).solve();
 
   t.ok(res, 'found a solution');
 
@@ -40,7 +40,7 @@ test('basic vertical test', function(t) {
 
   var vertical = [constraints.vertical, [line]];
 
-  var res = solve([vertical]);
+  var res = createSolver([vertical]).solve();
 
   t.ok(res, 'found a solution');
   t.ok(near(line[0][0], 0.5), 'start x near 0.5');
@@ -55,7 +55,7 @@ test('basic pointOnPoint test', function(t) {
   var point2 = [1, 1];
 
   var pointOnPoint = [constraints.pointOnPoint, [point1, point2]];
-  var res = solve([pointOnPoint]);
+  var res = createSolver([pointOnPoint]).solve();
 
   t.ok(res, 'found a solution');
   t.ok(near(point1[0], 0.5), 'point1 x near 0.5');
@@ -70,7 +70,7 @@ test('basic pointOnPoint', function(t) {
   var point2 = [1, 1];
 
   var pointOnPoint = [constraints.pointOnPoint, [point1, point2]];
-  var res = solve([pointOnPoint]);
+  var res = createSolver([pointOnPoint]).solve();
 
   t.ok(res, 'found a solution');
   t.ok(near(point1[0], 0.5), 'point1 x near 0.5');
@@ -86,7 +86,7 @@ test('basic pointOnPoint w/ fixed point', function(t) {
 
   var pointOnPoint = [constraints.pointOnPoint, [point1, point2]];
   var fixed = [constraints.fixed, [point1]];
-  var res = solve([pointOnPoint, fixed]);
+  var res = createSolver([pointOnPoint, fixed]).solve();
 
   // t.ok(res, 'found a solution');
   t.ok(near(point1[0], 0.0), 'point1 x near 0');
@@ -105,7 +105,7 @@ test('basic pointOnLine test', function(t) {
   ];
 
   var pointOnLine = [constraints.pointOnLine, [point, line]];
-  var res = solve([pointOnLine]);
+  var res = createSolver([pointOnLine]).solve();
 
   t.ok(res, 'found a solution');
   t.ok(near(point[0], 0.5), 'point1 x near 0.5');
@@ -133,7 +133,7 @@ test('basic pointOnLine test with fixed points', function(t) {
   var l1p0Fixed = [constraints.fixed, [line[0]]];
   var l1p1Fixed = [constraints.fixed, [line[1]]];
 
-  var res = solve([pointOnLine, l1p0Fixed, l1p1Fixed]);
+  var res = createSolver([pointOnLine, l1p0Fixed, l1p1Fixed]).solve();
 
   t.ok(res, 'found a solution');
   t.ok(near(point[0], 0.5), 'point1 x near 0.5');
@@ -157,7 +157,7 @@ test('basic internalAngle test with fixed points', function(t) {
 
   var internalAngle = [constraints.internalAngle, [Math.PI/2, line1, line2]]
 
-  var res = solve([l2p0Fixed, l1p0Fixed, l1p1Fixed, internalAngle]);
+  var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, internalAngle]).solve();
 
   t.ok(res, 'found a solution');
 
@@ -168,5 +168,3 @@ test('basic internalAngle test with fixed points', function(t) {
 
   t.end();
 });
-
-

@@ -1,4 +1,4 @@
-module.exports = solve;
+module.exports = ConstraintManager;
 
 var lineSearch = require('./line-search')
 
@@ -48,68 +48,14 @@ var CONVERGENCE_FINE = 1e-10;
 
 // TODO: make this handle addition/removal of constraints
 function ConstraintManager(constraints) {
+  if (!(this instanceof ConstraintManager)) {
+    return new ConstraintManager(constraints);
+  }
 
-  // pre-compute the fixed points
-  var toSolve = [];
-  this.fixedPoints = constraints.filter(function(a) {
-    var isFixed = a[0].name === 'fixed';
-    if (!isFixed) {
-      toSolve.push(a)
-    }
-    return isFixed;
-  }).map(function(a) {
-    // first component for identity test, second for
-    // a list of components affected.
-    return a[1][0];
-  });
-
-
-  var that = this;
-  this.components = [];
-  this.constraints = toSolve.map(function(constraint) {
-    var fn = constraint[0]
-    var args = constraint[1];
-    var variables = [];
-
-    fn.extract(constraint[1], function addComponent(point, key) {
-      // TODO: make this more efficient..
-      var r = that.fixedPoints.filter(function(a) {
-        if (a === point) {
-          return true;
-        }
-      })
-
-      var constant = typeof key === 'undefined'
-      var value = (constant) ? point : point[key];
-
-      if (r.length || constant) {
-        variables.push(value);
-      } else {
-        var valueIndex = that.components.length;
-        variables.push({
-          valueOf: function() {
-            return that.components[valueIndex]
-          }
-        })
-        that.components.push(value);
-      }
-    });
-
-
-    if (fn.name !== 'fixed') {
-      that.components.push()
-    } else {
-
-    }
-
-    constraint.push(variables);
-
-    return constraint
-  });
+  this.constraints = constraints || [];
 }
 
-ConstraintManager.prototype.sync = function() {
-  var constraints = this.constraints;
+ConstraintManager.prototype.sync = function(constraints) {
   var l = constraints.length;
 
   for (var i=0; i<l; i++) {
@@ -121,12 +67,70 @@ ConstraintManager.prototype.sync = function() {
   }
 }
 
+ConstraintManager.prototype.add = function(constraint) {
+  this.constraints.push(constraint);
+}
 
-function solve(constraints) {
-  var manager = new ConstraintManager(constraints);
+ConstraintManager.prototype.remove = function(constraint) {
+  this.constraints = this.constraints.filter(function(c) {
+    return c !== constraint
+  });
+}
+
+ConstraintManager.prototype.solve = function solve() {
+  var manager = this;
+
+  // pre-compute the fixed points
+  var toSolve = [];
+  var fixedPoints = this.constraints.filter(function(a) {
+    var isFixed = a[0].name === 'fixed';
+    if (!isFixed) {
+      toSolve.push(a)
+    }
+    return isFixed;
+  }).map(function(a) {
+    // first component for identity test, second for
+    // a list of components affected.
+    return a[1][0];
+  });
+
+  var components = [];
+  var constraints = toSolve.map(function(constraint) {
+    var fn = constraint[0]
+    var args = constraint[1];
+    var variables = [];
+
+    fn.extract(constraint[1], function addComponent(point, key) {
+      // TODO: make this more efficient..
+      var r = fixedPoints.filter(function(a) {
+        if (a === point) {
+          return true;
+        }
+      })
+
+      var constant = typeof key === 'undefined'
+      var value = (constant) ? point : point[key];
+
+      if (r.length || constant) {
+        variables.push(value);
+      } else {
+        var valueIndex = components.length;
+        variables.push({
+          valueOf: function() {
+            return components[valueIndex]
+          }
+        })
+        components.push(value);
+      }
+    });
+
+    constraint[2] = variables;
+
+    return constraint
+  });
 
   var l, i, j, k;
-  var components = manager.components
+
   function setComponent(idx, value) {
     components[idx] = value;
   }
@@ -369,7 +373,7 @@ function solve(constraints) {
   debug("Number of Iterations: %s", (MAX_ITERATIONS - iterations) + 1)
 
   // backfill the original entities
-  manager.sync();
+  manager.sync(constraints);
 
   return true;
 }
