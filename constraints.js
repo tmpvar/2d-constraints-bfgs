@@ -18,6 +18,43 @@ function hypot() {
   return sqrt(y);
 }
 
+
+function injectTwoLines(args, values) {
+  var line1 = args[0];
+  var line2 = args[1];
+  var a = line1[0];
+  var b = line1[1];
+  var c = line2[0];
+  var d = line2[1];
+
+  a[0] = values[0];
+  a[1] = values[1];
+  b[0] = values[2];
+  b[1] = values[3];
+  c[0] = values[4];
+  c[1] = values[5];
+  d[0] = values[6];
+  d[1] = values[7];
+}
+
+function extractTwoLines(args, addComponent) {
+  var line1 = args[0];
+  var line2 = args[1];
+  var a = line1[0];
+  var b = line1[1];
+  var c = line2[0];
+  var d = line2[1];
+
+  addComponent(a, 0);
+  addComponent(a, 1);
+  addComponent(b, 0);
+  addComponent(b, 1);
+  addComponent(c, 0);
+  addComponent(c, 1);
+  addComponent(d, 0);
+  addComponent(d, 1);
+};
+
 constraints.horizontal = horizontalConstraint;
 
 function horizontalConstraint(y1, y2) {
@@ -229,42 +266,8 @@ function equalLength(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
 }
 
 equalLength.size = 8;
-
-equalLength.extract = function(args, addComponent) {
-  var line1 = args[0];
-  var line2 = args[1];
-  var a = line1[0];
-  var b = line1[1];
-  var c = line2[0];
-  var d = line2[1];
-
-  addComponent(a, 0);
-  addComponent(a, 1);
-  addComponent(b, 0);
-  addComponent(b, 1);
-  addComponent(c, 0);
-  addComponent(c, 1);
-  addComponent(d, 0);
-  addComponent(d, 1);
-};
-
-equalLength.inject = function(args, values) {
-  var line1 = args[0];
-  var line2 = args[1];
-  var a = line1[0];
-  var b = line1[1];
-  var c = line2[0];
-  var d = line2[1];
-
-  a[0] = values[0];
-  a[1] = values[1];
-  b[0] = values[2];
-  b[1] = values[3];
-  c[0] = values[4];
-  c[1] = values[5];
-  d[0] = values[6];
-  d[1] = values[7];
-}
+equalLength.extract = extractTwoLines
+equalLength.inject = injectTwoLines;
 
 module.exports.lineLength = lineLength;
 
@@ -390,10 +393,10 @@ pointToPointDistance.inject = function(args, values) {
 module.exports.perpendicular = perpendicular;
 
 function perpendicular(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
-  var dx1 = (l1ex - l1sx);
-  var dy1 = (l1ey - l1sy);
-  var dx2 = (l2ex - l2sx);
-  var dy2 = (l2ey - l2sy);
+  var dx1 = l1ex - l1sx;
+  var dy1 = l1ey - l1sy;
+  var dx2 = l2ex - l2sx;
+  var dy2 = l2ey - l2sy;
 
   var hypotenuse1 = hypot(dx1, dy1);
   var hypotenuse2 = hypot(dx2, dy2);
@@ -408,39 +411,63 @@ function perpendicular(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
 }
 
 perpendicular.size = 8;
+perpendicular.extract = extractTwoLines;
+perpendicular.inject = injectTwoLines;
 
-perpendicular.extract = function(args, addComponent) {
-  var line1 = args[0];
-  var line2 = args[1];
-  var a = line1[0];
-  var b = line1[1];
-  var c = line2[0];
-  var d = line2[1];
+module.exports.parallel = parallel;
 
-  addComponent(a, 0);
-  addComponent(a, 1);
-  addComponent(b, 0);
-  addComponent(b, 1);
-  addComponent(c, 0);
-  addComponent(c, 1);
-  addComponent(d, 0);
-  addComponent(d, 1);
-};
+function parallel(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
+  var dx1 = l1ex - l1sx;
+  var dy1 = l1ey - l1sy;
+  var dx2 = l2ex - l2sx;
+  var dy2 = l2ey - l2sy;
 
-perpendicular.inject = function(args, values) {
-  var line1 = args[0];
-  var line2 = args[1];
-  var a = line1[0];
-  var b = line1[1];
-  var c = line2[0];
-  var d = line2[1];
+  var r = dx1 * dy2 - dy1 * dx2
+  return r * r;
+  // var hypotenuse1 = hypot(dx1, dy1);
+  // var hypotenuse2 = hypot(dx2, dy2);
 
-  a[0] = values[0];
-  a[1] = values[1];
-  b[0] = values[2];
-  b[1] = values[3];
-  c[0] = values[4];
-  c[1] = values[5];
-  d[0] = values[6];
-  d[1] = values[7];
+  // dx1 /= hypotenuse1;
+  // dy1 /= hypotenuse1;
+  // dx2 /= hypotenuse2;
+  // dy2 /= hypotenuse2;
+
+  // var r = dx1 * dx2 - dy1 * dy2;
+  // return r * r;
 }
+
+parallel.size = 8;
+parallel.extract = extractTwoLines;
+parallel.inject = injectTwoLines;
+
+module.exports.colinear = colinear;
+
+function colinear(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
+  var dx = l1ex - l1sx;
+  var dy = l1ey - l1sy;
+
+  var m=dy / dx;
+  var n=dx / dy;
+  var r = 0;
+
+  // Calculate the error between the expected intersection point
+  // and the true point of the second lines two end points on the
+  // first line
+  if(m <= 1 && m >- 1) {
+    //Calculate the expected y point given the x coordinate of the point
+    var ey1 = (l1sy + m * (l2sx - l1sx)) - l2sy;
+    var ey2 = (l1sy + m * (l2ex - l1sx)) - l2ey;
+    r = ey1 * ey1 + ey2 * ey2
+  } else {
+    //Calculate the expected x point given the y coordinate of the point
+    var ex1 = (l1sx + n * (l2sy - l1sy)) - l2sx;
+    var ex2 = (l1sx + n * (l2ey - l1sy)) - l2ex;
+    r = ex1 * ex1 + ex2 * ex2;
+  }
+  return r;
+
+}
+
+colinear.size = 8;
+colinear.extract = extractTwoLines;
+colinear.inject = injectTwoLines;

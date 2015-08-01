@@ -280,3 +280,130 @@ test('basic perpendicular with fixed points', function(t) {
 
   t.end();
 });
+
+test('basic colinear with fixed points (horizontal)', function(t) {
+  var line1 = [[0, 0], [10, 0]];
+  var line2 = [[10, 0], [20, 10]];
+
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+  var l1p1Fixed = [constraints.fixed, [line1[1]]];
+  var l2p0Fixed = [constraints.fixed, [line2[0]]];
+
+  var colinear = [constraints.colinear, [line1, line2]]
+
+  var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, colinear]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line1, [[0, 0], [10, 0]], 'line1 did not move')
+
+  t.deepEqual(line2[0], [10, 0], 'line2 start did not move')
+  t.ok(near(line2[0][1], line2[1][1]), 'line2 is horizontal')
+  t.ok(near(line2[1][1], 0), 'line2 end y is near 0')
+
+  t.end();
+});
+
+test('basic colinear with fixed points (vertical)', function(t) {
+  var line1 = [[0, 0], [0, 10]];
+  var line2 = [[0, 10], [10, 20]];
+
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+  var l1p1Fixed = [constraints.fixed, [line1[1]]];
+  var l2p0Fixed = [constraints.fixed, [line2[0]]];
+
+  var colinear = [constraints.colinear, [line1, line2]]
+
+  var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, colinear]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line1, [[0, 0], [0, 10]], 'line1 did not move')
+  t.deepEqual(line2[0], [0, 10], 'line2 start did not move')
+  t.ok(near(line2[0][0], line2[1][0]), 'line2 is vertical')
+  t.ok(near(line2[1][0], 0), 'line2 end y is near 0')
+
+  t.end();
+});
+
+
+test('basic colinear with fixed points (diagonal)', function(t) {
+  var line1 = [[0, 0], [10, 10]];
+  var line2 = [[10, 10], [10, 20]];
+
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+  var l1p1Fixed = [constraints.fixed, [line1[1]]];
+  var l2p0Fixed = [constraints.fixed, [line2[0]]];
+
+  var colinear = [constraints.colinear, [line1, line2]]
+
+  var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, colinear]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line1, [[0, 0], [10, 10]], 'line1 did not move')
+  t.deepEqual(line2[0], [10, 10], 'line2 start did not move')
+  t.ok(near(line2[1][0], 15), 'line2 end x is near 15')
+  t.ok(near(line2[1][1], 15), 'line2 end y is near 15')
+
+  t.end();
+});
+
+
+test('basic parallel with fixed points (horizontal)', function(t) {
+  var line1 = [[0, 0], [10, 0]];
+  var line2 = [[0, 2], [2, 10]];
+
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+  var l1p1Fixed = [constraints.fixed, [line1[1]]];
+  var l2p0Fixed = [constraints.fixed, [line2[0]]];
+
+  var parallel = [constraints.parallel, [line1, line2]]
+
+  var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, parallel]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line1, [[0, 0], [10, 0]], 'line1 did not move')
+  t.ok(near(line2[0][1], line2[1][1]), 'line2 is horizontal')
+
+  t.end();
+});
+
+test('basic parallel with fixed points (vertical)', function(t) {
+  var line1 = [[0, 0], [0, 10]];
+  var line2 = [[2, 0], [10, 10]];
+
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+  var l1p1Fixed = [constraints.fixed, [line1[1]]];
+  var l2p0Fixed = [constraints.fixed, [line2[0]]];
+
+  var parallel = [constraints.parallel, [line1, line2]]
+
+  var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, parallel]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line1, [[0, 0], [0, 10]], 'line1 did not move')
+  t.equal(line2[0][1], 0, 'line2 end y did not move')
+  t.equal(line2[1][1], 10, 'line2 end y did not move')
+  t.ok(near(line2[0][0], line2[1][0]), 'line2 is vertical')
+
+  t.end();
+});
+
+test('basic parallel with fixed points (diagonal)', function(t) {
+  var line1 = [[0, 0], [10, 10]];
+  var line2 = [[2, 0], [10, 10]];
+
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+  var l1p1Fixed = [constraints.fixed, [line1[1]]];
+  var l2p0Fixed = [constraints.fixed, [line2[0]]];
+
+  var parallel = [constraints.parallel, [line1, line2]]
+
+  var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, parallel]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line1, [[0, 0], [10, 10]], 'line1 did not move')
+  t.ok(near(line2[0][1], 0), 'line2 end y did not move')
+  t.ok(near(line2[1][0], 11), 'line2 end x near 9')
+  t.ok(near(line2[1][1], 9), 'line2 end y near 9')
+
+  t.end();
+});
