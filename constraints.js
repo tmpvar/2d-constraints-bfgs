@@ -349,3 +349,39 @@ symmetricPoints.inject = function(args, values) {
   b[0] = values[6];
   b[1] = values[7];
 }
+
+module.exports.pointToPointDistance = pointToPointDistance;
+
+function pointToPointDistance(distance, p1x, p1y, p2x, p2y) {
+  var dx = p2x - p1x;
+  var dy = p2y - p1y;
+  var r = hypot(dx, dy) - distance
+  return  r*r;
+}
+
+pointToPointDistance.size = 4;
+
+pointToPointDistance.extract = function(args, addComponent) {
+  var distance = args[0];
+  var p1 = args[1];
+  var p2 = args[2];
+
+  addComponent(distance);
+  addComponent(p1, 0);
+  addComponent(p1, 1);
+  addComponent(p2, 0);
+  addComponent(p2, 1);
+};
+
+pointToPointDistance.inject = function(args, values) {
+  var distance = args[0];
+  var p1 = args[1];
+  var p2 = args[2];
+
+  // skip backfilling distance
+
+  p1[0] = values[1];
+  p1[1] = values[2];
+  p2[0] = values[3];
+  p2[1] = values[4];
+}

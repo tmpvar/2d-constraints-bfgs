@@ -13,6 +13,12 @@ function near(a, b) {
   }
 }
 
+function distance(a, b) {
+  var dx = b[0] - a[0];
+  var dy = b[1] - a[1];
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 test('basic horizontal test', function(t) {
   var line = [
     [0, 0],
@@ -193,10 +199,8 @@ test('basic lineLength test', function(t) {
   var res = createSolver([lineLength]).solve();
 
   t.ok(res, 'found a solution');
-  var dx = line[1][0] - line[0][0];
-  var dy = line[1][1] - line[0][1];
-  var d = Math.sqrt(dx * dx + dy * dy);
-  t.ok(near(d, 10), 'line is 10 units long');
+
+  t.ok(near(distance(line[0], line[1]), 10), 'line is 10 units long');
 
   t.end();
 });
@@ -237,5 +241,23 @@ test('basic symmetricPoints', function(t) {
   t.ok(near(point2[0], 10), 'point2.x is near 10')
   t.ok(near(point2[1], 5), 'point2.y is near 5')
 
+  t.end();
+});
+
+test('basic pointToPointDistance', function(t) {
+  var point1 = [0, 0];
+  var point2 = [10, 0];
+  var d = 5;
+
+  var pfixed = [constraints.fixed, [point1]];
+  var p2p = [constraints.pointToPointDistance, [d, point1, point2]]
+
+  var res = createSolver([pfixed, p2p]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(point1, [0, 0], 'point1 did not move')
+  t.ok(near(point2[0], 5), 'point2.x is near 5')
+  t.ok(near(point2[1], 0), 'point2.y is near 0')
+  t.ok(near(distance(point1, point2), d))
   t.end();
 });
