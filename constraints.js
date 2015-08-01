@@ -2,6 +2,8 @@ var constraints = module.exports = {};
 
 var debug = process.env.DEBUG ? console.log : function() {};
 var cos = Math.cos;
+var pow = Math.pow;
+var sqrt = Math.sqrt;
 
 function hypot() {
   var y = 0;
@@ -13,7 +15,7 @@ function hypot() {
     }
     y += arguments[i] * arguments[i];
   }
-  return Math.sqrt(y);
+  return sqrt(y);
 }
 
 constraints.horizontal = horizontalConstraint;
@@ -219,7 +221,6 @@ internalAngle.inject = function(args, values) {
   d[1] = values[8];
 }
 
-
 module.exports.equalLength = equalLength;
 
 function equalLength(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
@@ -263,4 +264,38 @@ equalLength.inject = function(args, values) {
   c[1] = values[5];
   d[0] = values[6];
   d[1] = values[7];
+}
+
+module.exports.lineLength = lineLength;
+
+function lineLength(length, l1sx, l1sy, l1ex, l1ey) {
+  var r = hypot(l1ex - l1sx , l1ey - l1sy) - length;
+  return r * r;
+}
+
+lineLength.size = 5;
+
+lineLength.extract = function(args, addComponent) {
+  var length = args[0];
+  var line1 = args[1];
+  var a = line1[0];
+  var b = line1[1];
+
+  addComponent(length);
+  addComponent(a, 0);
+  addComponent(a, 1);
+  addComponent(b, 0);
+  addComponent(b, 1);
+};
+
+lineLength.inject = function(args, values) {
+  var line1 = args[1];
+  var a = line1[0];
+  var b = line1[1];
+  args[0] = values[0];
+
+  a[0] = values[1];
+  a[1] = values[2];
+  b[0] = values[3];
+  b[1] = values[4];
 }

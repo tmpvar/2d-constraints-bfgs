@@ -184,3 +184,20 @@ test('basic equalLength test with fixed points', function(t) {
 
   t.end();
 });
+
+test('basic lineLength test with fixed start point', function(t) {
+  var line1 = [[0, 0], [10, 0]];
+
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+
+  var lineLength = [constraints.lineLength, [5, line1]]
+
+  var res = createSolver([l1p0Fixed, lineLength]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line1[0], [0, 0], 'line start did not move')
+  t.equal(line1[0][1], 0, 'line end y did not move')
+  t.ok(near(line1[1][0], 5), 'line2.end.x is near 5')
+
+  t.end();
+});
