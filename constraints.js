@@ -218,3 +218,49 @@ internalAngle.inject = function(args, values) {
   d[0] = values[7];
   d[1] = values[8];
 }
+
+
+module.exports.equalLength = equalLength;
+
+function equalLength(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
+  var r = (hypot(l1ex - l1sx , l1ey - l1sy) - hypot(l2ex - l2sx, l2ey - l2sy));
+  return r * r;
+}
+
+equalLength.size = 8;
+
+equalLength.extract = function(args, addComponent) {
+  var line1 = args[0];
+  var line2 = args[1];
+  var a = line1[0];
+  var b = line1[1];
+  var c = line2[0];
+  var d = line2[1];
+
+  addComponent(a, 0);
+  addComponent(a, 1);
+  addComponent(b, 0);
+  addComponent(b, 1);
+  addComponent(c, 0);
+  addComponent(c, 1);
+  addComponent(d, 0);
+  addComponent(d, 1);
+};
+
+equalLength.inject = function(args, values) {
+  var line1 = args[0];
+  var line2 = args[1];
+  var a = line1[0];
+  var b = line1[1];
+  var c = line2[0];
+  var d = line2[1];
+
+  a[0] = values[0];
+  a[1] = values[1];
+  b[0] = values[2];
+  b[1] = values[3];
+  c[0] = values[4];
+  c[1] = values[5];
+  d[0] = values[6];
+  d[1] = values[7];
+}
