@@ -261,3 +261,22 @@ test('basic pointToPointDistance', function(t) {
   t.ok(near(distance(point1, point2), d))
   t.end();
 });
+
+test('basic perpendicular with fixed points', function(t) {
+  var line1 = [[0, 0], [10, 0]];
+  var line2 = [[5, 1], [10, 10]];
+
+  var l1p0Fixed = [constraints.fixed, [line1[0]]];
+  var l1p1Fixed = [constraints.fixed, [line1[1]]];
+  var l2p0Fixed = [constraints.fixed, [line2[0]]];
+
+  var perp = [constraints.perpendicular, [line1, line2]]
+
+  var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, perp]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line1, [[0, 0], [10, 0]], 'line1 did not move')
+  t.ok(near(line2[0][0], line2[1][0]), 'line2 is vertical')
+
+  t.end();
+});

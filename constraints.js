@@ -350,6 +350,7 @@ symmetricPoints.inject = function(args, values) {
   b[1] = values[7];
 }
 
+// TODO: try to reuse this for pointOnCircle
 module.exports.pointToPointDistance = pointToPointDistance;
 
 function pointToPointDistance(distance, p1x, p1y, p2x, p2y) {
@@ -384,4 +385,62 @@ pointToPointDistance.inject = function(args, values) {
   p1[1] = values[2];
   p2[0] = values[3];
   p2[1] = values[4];
+}
+
+module.exports.perpendicular = perpendicular;
+
+function perpendicular(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
+  var dx1 = (l1ex - l1sx);
+  var dy1 = (l1ey - l1sy);
+  var dx2 = (l2ex - l2sx);
+  var dy2 = (l2ey - l2sy);
+
+  var hypotenuse1 = hypot(dx1, dy1);
+  var hypotenuse2 = hypot(dx2, dy2);
+
+  dx1 /= hypotenuse1;
+  dy1 /= hypotenuse1;
+  dx2 /= hypotenuse2;
+  dy2 /= hypotenuse2;
+
+  var r = dx1 * dx2 + dy1 * dy2;
+  return r * r;
+}
+
+perpendicular.size = 8;
+
+perpendicular.extract = function(args, addComponent) {
+  var line1 = args[0];
+  var line2 = args[1];
+  var a = line1[0];
+  var b = line1[1];
+  var c = line2[0];
+  var d = line2[1];
+
+  addComponent(a, 0);
+  addComponent(a, 1);
+  addComponent(b, 0);
+  addComponent(b, 1);
+  addComponent(c, 0);
+  addComponent(c, 1);
+  addComponent(d, 0);
+  addComponent(d, 1);
+};
+
+perpendicular.inject = function(args, values) {
+  var line1 = args[0];
+  var line2 = args[1];
+  var a = line1[0];
+  var b = line1[1];
+  var c = line2[0];
+  var d = line2[1];
+
+  a[0] = values[0];
+  a[1] = values[1];
+  b[0] = values[2];
+  b[1] = values[3];
+  c[0] = values[4];
+  c[1] = values[5];
+  d[0] = values[6];
+  d[1] = values[7];
 }
