@@ -7,7 +7,7 @@
   "name": "2d-constraints-bfgs",
   "version": "0.0.0",
   "description": "iteratively solve geometric constraints in 2d using bfgs",
-  "main": "constraints.js",
+  "main": "solver.js",
   "scripts": {
     "test": "tape test.js"
   },
