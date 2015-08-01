@@ -299,3 +299,53 @@ lineLength.inject = function(args, values) {
   b[0] = values[3];
   b[1] = values[4];
 }
+
+module.exports.symmetricPoints = symmetricPoints;
+
+function symmetricPoints(p1x, p1y, p2x, p2y, l1sx, l1sy, l1ex, l1ey) {
+  var dx=l1ex-l1sx;
+  var dy=l1ey-l1sy;
+
+  var t = -(dy * p1x - dx * p1y - dy * l1sx + dx * l1sy) / (dx * dx + dy * dy);
+  var ex = p1x + dy * t * 2;
+  var ey = p1y - dx * t * 2;
+  var tx = ex - p2x;
+  var ty = ey - p2y;
+  return tx * tx + ty * ty;
+}
+
+symmetricPoints.size = 8;
+
+symmetricPoints.extract = function(args, addComponent) {
+  var p1 = args[0];
+  var p2 = args[1];
+  var line = args[2];
+  var a = line[0];
+  var b = line[1];
+
+  addComponent(p1, 0);
+  addComponent(p1, 1);
+  addComponent(p2, 0);
+  addComponent(p2, 1);
+  addComponent(a, 0);
+  addComponent(a, 1);
+  addComponent(b, 0);
+  addComponent(b, 1);
+};
+
+symmetricPoints.inject = function(args, values) {
+  var p1 = args[0];
+  var p2 = args[1];
+  var line = args[2];
+  var a = line[0];
+  var b = line[1];
+
+  p1[0] = values[0];
+  p1[1] = values[1];
+  p2[0] = values[2];
+  p2[1] = values[3];
+  a[0] = values[4];
+  a[1] = values[5];
+  b[0] = values[6];
+  b[1] = values[7];
+}

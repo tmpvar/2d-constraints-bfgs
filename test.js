@@ -217,3 +217,25 @@ test('basic lineLength test with fixed start point', function(t) {
 
   t.end();
 });
+
+test('basic symmetricPoints', function(t) {
+  var line = [[5, 10], [5, 0]];
+  var point1 = [0, 5];
+  var point2 = [0, 0];
+
+  var lsfixed = [constraints.fixed, [line[0]]];
+  var lefixed = [constraints.fixed, [line[1]]];
+  var pfixed = [constraints.fixed, [point1]];
+
+  var symmetricPoints = [constraints.symmetricPoints, [point1, point2, line]]
+
+  var res = createSolver([lsfixed, lefixed, pfixed, symmetricPoints]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line, [[5, 10], [5, 0]], 'line did not move')
+  t.deepEqual(point1, [0, 5], 'line did not move')
+  t.ok(near(point2[0], 10), 'point2.x is near 10')
+  t.ok(near(point2[1], 5), 'point2.y is near 5')
+
+  t.end();
+});
