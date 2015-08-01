@@ -471,3 +471,44 @@ function colinear(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
 colinear.size = 8;
 colinear.extract = extractTwoLines;
 colinear.inject = injectTwoLines;
+
+
+constraints.pointOnLineMidpoint = pointOnLineMidpoint;
+
+function pointOnLineMidpoint(px, py, x1, y1, x2, y2) {
+  var mx = pow((x1 + x2) / 2 - px, 2);
+  var my = pow((y1 + y2) / 2 - py, 2);
+  return mx+my
+}
+
+pointOnLineMidpoint.size = 6;
+
+pointOnLineMidpoint.extract = function(args, addComponent) {
+  var point = args[0]
+  var line = args[1];
+  var a = line[0];
+  var b = line[1];
+
+  addComponent(point, 0)
+  addComponent(point, 1)
+
+  addComponent(a, 0)
+  addComponent(a, 1)
+  addComponent(b, 0)
+  addComponent(b, 1)
+};
+
+pointOnLineMidpoint.inject = function(args, values) {
+  var point = args[0]
+  var line = args[1];
+  var a = line[0];
+  var b = line[1];
+
+  point[0] = values[0];
+  point[1] = values[1];
+
+  a[0] = values[2];
+  a[1] = values[3];
+  b[0] = values[4];
+  b[1] = values[5];
+}

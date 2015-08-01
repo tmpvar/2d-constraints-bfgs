@@ -407,3 +407,22 @@ test('basic parallel with fixed points (diagonal)', function(t) {
 
   t.end();
 });
+
+test('basic pointOnLineMidpoint', function(t) {
+  var line = [[0, 0], [10, 0]];
+  var point = [100, 0];
+
+  var l1p0Fixed = [constraints.fixed, [line[0]]];
+  var l1p1Fixed = [constraints.fixed, [line[1]]];
+
+  var midpoint = [constraints.pointOnLineMidpoint, [point, line]]
+
+  var res = createSolver([l1p0Fixed, l1p1Fixed, midpoint]).solve();
+
+  t.ok(res, 'found a solution');
+  t.deepEqual(line, [[0, 0], [10, 0]], 'line1 did not move');
+  t.ok(near(point[0], 5), 'point x near 5');
+  t.equal(point[1], 0, 'point y is on 0');
+
+  t.end();
+});
