@@ -2,5 +2,32 @@
   "dependencies": {
     "cwise": "^1.0.8",
     "tape": "^4.0.1"
-  }
+  },
+  "devDependencies": {},
+  "name": "2d-constraints-bfgs",
+  "version": "0.0.0",
+  "description": "iteratively solve geometric constraints in 2d using bfgs",
+  "main": "constraints.js",
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tmpvar/2d-constraints-bfgs.git"
+  },
+  "keywords": [
+    "constraints",
+    "2d",
+    "bfgs",
+    "iterative",
+    "quasi-newton",
+    "newton",
+    "solver"
+  ],
+  "author": "Elijah Insua <tmpvar@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tmpvar/2d-constraints-bfgs/issues"
+  },
+  "homepage": "https://github.com/tmpvar/2d-constraints-bfgs"
 }
