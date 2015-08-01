@@ -185,6 +185,22 @@ test('basic equalLength test with fixed points', function(t) {
   t.end();
 });
 
+test('basic lineLength test', function(t) {
+  var line = [[-10, 0], [10, 0]];
+
+  var lineLength = [constraints.lineLength, [10, line]]
+
+  var res = createSolver([lineLength]).solve();
+
+  t.ok(res, 'found a solution');
+  var dx = line[1][0] - line[0][0];
+  var dy = line[1][1] - line[0][1];
+  var d = Math.sqrt(dx * dx + dy * dy);
+  t.ok(near(d, 10), 'line is 10 units long');
+
+  t.end();
+});
+
 test('basic lineLength test with fixed start point', function(t) {
   var line1 = [[0, 0], [10, 0]];
 
