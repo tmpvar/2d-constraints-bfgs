@@ -425,3 +425,24 @@ test('ConstraintManager#isPointFixed', function(t) {
   t.notOk(s.isPointFixed(notFixed), 'notFixed is not fixed')
   t.end();
 })
+
+test('overconstrained skips syncing and returns false', function(t) {
+  var fixedPoint = [0, 0];
+  var fixedPoint2 = [1, 1];
+  var movablePoint = [10, 0];
+
+  var s = createSolver([
+    [constraints.fixed, [fixedPoint]],
+    [constraints.fixed, [fixedPoint2]],
+    [constraints.pointOnPoint, [fixedPoint2, fixedPoint]],
+    [constraints.horizontal, [fixedPoint2, movablePoint]],
+  ])
+  var r = s.solve();
+  t.notOk(r);
+
+  t.ok(s.isPointFixed(fixedPoint), 'no solution')
+  t.deepEqual(fixedPoint, [0, 0], 'fixedPoint did not move');
+  t.deepEqual(fixedPoint2, [1, 1], 'fixedPoint2 did not move');
+  t.deepEqual(movablePoint, [10, 0], 'fixedPoint2 did not move');
+  t.end();
+})

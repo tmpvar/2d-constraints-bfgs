@@ -382,8 +382,11 @@ ConstraintManager.prototype.solve = function solve() {
   debug("Fnew: %s", fnew);
   debug("Number of Iterations: %s", (MAX_ITERATIONS - iterations) + 1)
 
-  // backfill the original entities
-  manager.sync(constraints);
-
+  if (isNaN(fnew) || fnew > 1e-12) {
+    return false;
+  } else {
+    // backfill the original entities
+    manager.sync(constraints);
+  }
   return true;
 }
