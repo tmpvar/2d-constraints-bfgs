@@ -1,13 +1,13 @@
 module.exports = ConstraintManager;
 
-var lineSearch = require('./line-search')
+var lineSearch = require('./line-search');
 
 var debug = process.env.DEBUG ? console.log : function() {};
 
 function squareMatrix(width) {
   var c = new Array(width);
   for (var i=0; i<width; i++) {
-    var r = c[i] = new Array(width)
+    var r = c[i] = new Array(width);
     for (var j=0; j<width; j++) {
       r[j] = 0;
     }
@@ -39,9 +39,9 @@ function calc(constraints, components) {
 }
 
 
-var PERTURB_MAGNITUDE = 1e-6
-var PERTURB_MINIMUM = 1e-10
-var MAX_ITERATIONS = 50 //Note that the total number of iterations allowed is MaxIterations *l
+var PERTURB_MAGNITUDE = 1e-6;
+var PERTURB_MINIMUM = 1e-10;
+var MAX_ITERATIONS = 50; //Note that the total number of iterations allowed is MaxIterations *l
 var EPS = 1e-20;
 var CONVERGENCE_ROUGH = 1e-8;
 var CONVERGENCE_FINE = 1e-10;
@@ -63,19 +63,21 @@ ConstraintManager.prototype.sync = function(constraints) {
     var fn = constraint[0];
     var orig = constraint[1];
     var vars = constraint[2];
-    fn.inject(orig, vars.map(function(v) { return v+0 }));
+    fn.inject(orig, vars.map(function(v) {
+      return v+0;
+    }));
   }
-}
+};
 
 ConstraintManager.prototype.add = function(constraint) {
   this.constraints.push(constraint);
-}
+};
 
 ConstraintManager.prototype.remove = function(constraint) {
   this.constraints = this.constraints.filter(function(c) {
-    return c !== constraint
+    return c !== constraint;
   });
-}
+};
 
 ConstraintManager.prototype.isPointFixed = function(point) {
   var constraints = this.constraints;
@@ -89,7 +91,7 @@ ConstraintManager.prototype.isPointFixed = function(point) {
     }
   }
   return false;
-}
+};
 
 ConstraintManager.prototype.solve = function solve() {
   var manager = this;
@@ -99,7 +101,7 @@ ConstraintManager.prototype.solve = function solve() {
   var fixedPoints = this.constraints.filter(function(a) {
     var isFixed = a[0].name === 'fixed';
     if (!isFixed) {
-      toSolve.push(a)
+      toSolve.push(a);
     }
     return isFixed;
   }).map(function(a) {
@@ -112,7 +114,7 @@ ConstraintManager.prototype.solve = function solve() {
   var seenPoints = [];
   var seenPointsComponents = [];
   var constraints = toSolve.map(function(constraint) {
-    var fn = constraint[0]
+    var fn = constraint[0];
     var args = constraint[1];
     var variables = [];
 
@@ -125,7 +127,7 @@ ConstraintManager.prototype.solve = function solve() {
         existingComponent = seenPointsComponents[existingPoint].indexOf(key);
       }
 
-      var constant = typeof key === 'undefined'
+      var constant = typeof key === 'undefined';
       var value = (constant) ? point : point[key];
 
       if (fixed || constant) {
@@ -142,7 +144,7 @@ ConstraintManager.prototype.solve = function solve() {
 
         variables.push({
           valueOf: function() {
-            return components[valueIndex]
+            return components[valueIndex];
           }
         });
       }
@@ -157,7 +159,7 @@ ConstraintManager.prototype.solve = function solve() {
 
     constraint[2] = variables;
 
-    return constraint
+    return constraint;
   });
 
   var l, i, j, k;
@@ -172,7 +174,7 @@ ConstraintManager.prototype.solve = function solve() {
 
   // perform a baseline compute using the incoming components
   var f0 = calc(constraints, components);
-  debug('---------\n')
+  debug('---------\n');
   if (f0 < EPS/2) {
     // return immediately if already stable
     return true;
@@ -180,23 +182,24 @@ ConstraintManager.prototype.solve = function solve() {
 
   debug('f0:', f0);
   var perturbValue = f0 * PERTURB_MAGNITUDE;
-  debug('perturbValue:', perturbValue)
+  debug('perturbValue:', perturbValue);
   var gradient = new Array(l);
   var gradientNormal = 0;
+  var first, second;
 
   for (i=0; i<l; i++) {
     var original = components[i];
 
     setComponent(i, original - perturbValue);
-    debug('sub: %s - %s = %s', original, perturbValue, components[i])
-    var first = calc(constraints, components);
+    debug('sub: %s - %s = %s', original, perturbValue, components[i]);
+    first = calc(constraints, components);
 
     setComponent(i, original + perturbValue);
-    var second = calc(constraints, components);
+    second = calc(constraints, components);
 
     debug('perturb: %s - %s', first, second);
 
-    gradient[i] =  (.5 * (second - first)) / perturbValue;
+    gradient[i] =  (0.5 * (second - first)) / perturbValue;
     debug('gradient[%s] = %s', i, gradient[i]);
 
     // reset components back to the orig
@@ -240,7 +243,7 @@ ConstraintManager.prototype.solve = function solve() {
     componentsCopy,
     searchVector,
     calc
-  )
+  );
 
   var firstSecond = squareMatrix(l);
   var deltaXDotGammatDotN = squareMatrix(l);
@@ -250,7 +253,6 @@ ConstraintManager.prototype.solve = function solve() {
   var bottom = 0;
   var firstTerm = 0;
   var gammatDotNDotGamma = 0;
-  var firstTerm = 0;
   var deltaXnorm = 1;
   var iterations = MAX_ITERATIONS;
   var steps = 0;
@@ -261,12 +263,10 @@ ConstraintManager.prototype.solve = function solve() {
   var gamma = nvec(l);
   var gammatDotN = nvec(l);
 
-
   // TODO: make this a fn arg
   var convergence = CONVERGENCE_ROUGH;
 
   // TODO: rename this to componentsDelta
-  var deltaX = new Array(l);
   for (i=0; i<l; i++) {
     deltaX[i] = components[i] - componentsCopy[i];
   }
@@ -300,8 +300,8 @@ ConstraintManager.prototype.solve = function solve() {
       first = calc(constraints, components);
       setComponent(i, oldParamValue + perturbValue);
 
-      second= calc(constraints, components);
-      gradnew[i]=.5 * (second - first) / perturbValue;
+      second = calc(constraints, components);
+      gradnew[i] = 0.5 * (second - first) / perturbValue;
 
       setComponent(i, oldParamValue);
       //Calculate the change in the gradient
@@ -315,8 +315,8 @@ ConstraintManager.prototype.solve = function solve() {
 
 
     //make sure that bottom is never 0
-    if (bottom==0) {
-      bottom=.0000000001;
+    if (bottom === 0) {
+      bottom = Number.MIN_VALUE;
     }
 
     //calculate all (1xn).(nxn)
@@ -392,17 +392,16 @@ ConstraintManager.prototype.solve = function solve() {
       componentsCopy,
       searchVector,
       calc
-    )
+    );
     iterations--;
   }
 
-
   components.map(function(c, i) {
     debug('Parameter(%s): %s', i, c);
-  })
+  });
 
   debug("Fnew: %s", fnew);
-  debug("Number of Iterations: %s", (MAX_ITERATIONS - iterations) + 1)
+  debug("Number of Iterations: %s", (MAX_ITERATIONS - iterations) + 1);
 
   if (isNaN(fnew) || fnew > 1e-12) {
     return false;
@@ -411,4 +410,4 @@ ConstraintManager.prototype.solve = function solve() {
     manager.sync(constraints);
   }
   return true;
-}
+};
