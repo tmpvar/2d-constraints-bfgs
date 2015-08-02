@@ -28,7 +28,7 @@ function calc(constraints, components) {
   var l = constraints.length;
   var where = 0;
 
-  for (i=0; i<constraints.length; i++) {
+  for (i=0; i<l; i++) {
     var constraint = constraints[i];
     var size = constraint.size;
     val += constraints[i][0].apply(null, constraints[i][2]);
@@ -109,6 +109,8 @@ ConstraintManager.prototype.solve = function solve() {
   });
 
   var components = [];
+  var seenPoints = [];
+  var seenPointsComponents = [];
   var constraints = toSolve.map(function(constraint) {
     var fn = constraint[0]
     var args = constraint[1];
@@ -117,6 +119,11 @@ ConstraintManager.prototype.solve = function solve() {
     fn.extract(constraint[1], function addComponent(point, key) {
       // TODO: make this more efficient..
       var fixed = fixedPoints.indexOf(point) > -1;
+      var existingPoint = seenPoints.indexOf(point);
+      var existingComponent = -1;
+      if (seenPointsComponents[existingPoint]) {
+        existingComponent = seenPointsComponents[existingPoint].indexOf(key);
+      }
 
       var constant = typeof key === 'undefined'
       var value = (constant) ? point : point[key];
@@ -124,13 +131,27 @@ ConstraintManager.prototype.solve = function solve() {
       if (fixed || constant) {
         variables.push(value);
       } else {
-        var valueIndex = components.length;
+        var valueIndex;
+
+        if (existingComponent === -1) {
+          valueIndex = components.length;
+          components.push(value);
+        } else {
+          valueIndex = existingComponent;
+        }
+
         variables.push({
           valueOf: function() {
             return components[valueIndex]
           }
-        })
-        components.push(value);
+        });
+      }
+
+      if (existingPoint === -1) {
+        seenPoints.push(point);
+        seenPointsComponents.push([key]);
+      } else if (existingComponent === -1) {
+        seenPointsComponents[existingPoint].push(key);
       }
     });
 

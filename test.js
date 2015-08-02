@@ -436,11 +436,40 @@ test('overconstrained skips syncing and returns false', function(t) {
     [constraints.horizontal, [fixedPoint2, movablePoint]],
   ])
   var r = s.solve();
-  t.notOk(r);
 
-  t.ok(s.isPointFixed(fixedPoint), 'no solution')
+  t.notOk(r, 'no solution');
+  t.ok(s.isPointFixed(fixedPoint), 'fixedPoint is fixed');
   t.deepEqual(fixedPoint, [0, 0], 'fixedPoint did not move');
   t.deepEqual(fixedPoint2, [1, 1], 'fixedPoint2 did not move');
   t.deepEqual(movablePoint, [10, 0], 'fixedPoint2 did not move');
+  t.end();
+})
+
+test('multiple constraints do not clobber eachother', function(t) {
+  function solve(reverse) {
+    var fixedPoint = [0, 0];
+    var fixedPoint2 = [1, 1];
+    var movablePoint = [2, -1];
+    var c = [
+      [constraints.fixed, [fixedPoint]],
+      [constraints.fixed, [fixedPoint2]],
+      [constraints.equalLength, [fixedPoint, fixedPoint2, fixedPoint2, movablePoint]],
+      [constraints.internalAngle, [Math.PI/2, fixedPoint, fixedPoint2, fixedPoint2, movablePoint]]
+    ];
+
+    if (reverse) {
+      c.reverse();
+    }
+
+    t.ok(createSolver(c).solve(), 'found solution');
+
+    return movablePoint;
+  }
+
+  var p1 = solve();
+  var p2 = solve(true)
+
+  t.ok(near(p1[0], p2[0]), 'results x axes are basically the same');
+  t.ok(near(p1[1], p2[1]), 'results y axes are basically the same');
   t.end();
 })
