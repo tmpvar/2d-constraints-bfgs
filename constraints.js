@@ -124,21 +124,7 @@ pointOnPoint.inject = injectPoints;
 constraints.fixed = fixed;
 
 function fixed(px, py, ox, oy) {
-  return 0;
-  var dx = px - ox;
-  var dy = py - oy;
-
-  return dx * dx + dy * dy;
-}
-
-fixed.size = 0;
-
-fixed.extract = function(args) {
-  // NOOP: no need to add points
-}
-
-fixed.inject = function(orig, values) {
-  // NOOP: you can't change me sucka!!!
+  // placeholder, fixed is filtered out before solve
 }
 
 constraints.pointOnLine = pointOnLine;
