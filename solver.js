@@ -375,6 +375,7 @@ ConstraintManager.prototype.solve = function solve() {
     iterations--;
   }
 
+
   components.map(function(c, i) {
     debug('Parameter(%s): %s', i, c);
   })

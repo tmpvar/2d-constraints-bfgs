@@ -25,7 +25,7 @@ test('basic horizontal test', function(t) {
     [1, 1]
   ];
 
-  var horizontal = [constraints.horizontal, [line]];
+  var horizontal = [constraints.horizontal, [line[0], line[1]]];
 
   var res = createSolver([horizontal]).solve();
 
@@ -44,7 +44,7 @@ test('basic vertical test', function(t) {
     [1, 1]
   ];
 
-  var vertical = [constraints.vertical, [line]];
+  var vertical = [constraints.vertical, [line[0], line[1]]];
 
   var res = createSolver([vertical]).solve();
 
@@ -95,7 +95,7 @@ test('basic pointOnLine test', function(t) {
     [1, 0]
   ];
 
-  var pointOnLine = [constraints.pointOnLine, [point, line]];
+  var pointOnLine = [constraints.pointOnLine, [point, line[0], line[1]]];
   var res = createSolver([pointOnLine]).solve();
 
   t.ok(res, 'found a solution');
@@ -118,7 +118,7 @@ test('basic pointOnLine test with fixed points', function(t) {
     [1, 0]
   ];
 
-  var pointOnLine = [constraints.pointOnLine, [point, line]];
+  var pointOnLine = [constraints.pointOnLine, [point, line[0], line[1]]];
   var l1p0Fixed = [constraints.fixed, [line[0]]];
   var l1p1Fixed = [constraints.fixed, [line[1]]];
 
@@ -142,7 +142,7 @@ test('basic internalAngle test with fixed points', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var internalAngle = [constraints.internalAngle, [Math.PI/2, line1, line2]]
+  var internalAngle = [constraints.internalAngle, [Math.PI/2, line1[0], line1[1], line2[0], line2[1]]]
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, internalAngle]).solve();
 
@@ -163,7 +163,7 @@ test('basic equalLength test with fixed points', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var equalLength = [constraints.equalLength, [line1, line2]]
+  var equalLength = [constraints.equalLength, [line1[0], line1[1], line2[0], line2[1]]]
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, equalLength]).solve();
 
@@ -179,7 +179,7 @@ test('basic equalLength test with fixed points', function(t) {
 test('basic lineLength test', function(t) {
   var line = [[-10, 0], [10, 0]];
 
-  var lineLength = [constraints.lineLength, [10, line]]
+  var lineLength = [constraints.lineLength, [10, line[0], line[1]]]
 
   var res = createSolver([lineLength]).solve();
 
@@ -195,7 +195,7 @@ test('basic lineLength test with fixed start point', function(t) {
 
   var l1p0Fixed = [constraints.fixed, [line1[0]]];
 
-  var lineLength = [constraints.lineLength, [5, line1]]
+  var lineLength = [constraints.lineLength, [5, line1[0], line1[1]]]
 
   var res = createSolver([l1p0Fixed, lineLength]).solve();
 
@@ -216,7 +216,7 @@ test('basic symmetricPoints', function(t) {
   var lefixed = [constraints.fixed, [line[1]]];
   var pfixed = [constraints.fixed, [point1]];
 
-  var symmetricPoints = [constraints.symmetricPoints, [point1, point2, line]]
+  var symmetricPoints = [constraints.symmetricPoints, [point1, point2, line[0], line[1]]];
 
   var res = createSolver([lsfixed, lefixed, pfixed, symmetricPoints]).solve();
 
@@ -255,7 +255,7 @@ test('basic perpendicular with fixed points', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var perp = [constraints.perpendicular, [line1, line2]]
+  var perp = [constraints.perpendicular, [line1[0], line1[1], line2[0], line2[1]]];
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, perp]).solve();
 
@@ -274,13 +274,12 @@ test('basic colinear with fixed points (horizontal)', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var colinear = [constraints.colinear, [line1, line2]]
+  var colinear = [constraints.colinear, [line1[0], line1[1], line2[0], line2[1]]];
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, colinear]).solve();
 
   t.ok(res, 'found a solution');
   t.deepEqual(line1, [[0, 0], [10, 0]], 'line1 did not move')
-
   t.deepEqual(line2[0], [10, 0], 'line2 start did not move')
   t.ok(near(line2[0][1], line2[1][1]), 'line2 is horizontal')
   t.ok(near(line2[1][1], 0), 'line2 end y is near 0')
@@ -296,7 +295,7 @@ test('basic colinear with fixed points (vertical)', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var colinear = [constraints.colinear, [line1, line2]]
+  var colinear = [constraints.colinear, [line1[0], line1[1], line2[0], line2[1]]]
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, colinear]).solve();
 
@@ -318,7 +317,7 @@ test('basic colinear with fixed points (diagonal)', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var colinear = [constraints.colinear, [line1, line2]]
+  var colinear = [constraints.colinear, [line1[0], line1[1], line2[0], line2[1]]];
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, colinear]).solve();
 
@@ -331,7 +330,6 @@ test('basic colinear with fixed points (diagonal)', function(t) {
   t.end();
 });
 
-
 test('basic parallel with fixed points (horizontal)', function(t) {
   var line1 = [[0, 0], [10, 0]];
   var line2 = [[0, 2], [2, 10]];
@@ -340,7 +338,7 @@ test('basic parallel with fixed points (horizontal)', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var parallel = [constraints.parallel, [line1, line2]]
+  var parallel = [constraints.parallel, [line1[0], line1[1], line2[0], line2[1]]]
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, parallel]).solve();
 
@@ -359,7 +357,7 @@ test('basic parallel with fixed points (vertical)', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var parallel = [constraints.parallel, [line1, line2]]
+  var parallel = [constraints.parallel, [line1[0], line1[1], line2[0], line2[1]]];
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, parallel]).solve();
 
@@ -380,7 +378,7 @@ test('basic parallel with fixed points (diagonal)', function(t) {
   var l1p1Fixed = [constraints.fixed, [line1[1]]];
   var l2p0Fixed = [constraints.fixed, [line2[0]]];
 
-  var parallel = [constraints.parallel, [line1, line2]]
+  var parallel = [constraints.parallel, [line1[0], line1[1], line2[0], line2[1]]];
 
   var res = createSolver([l2p0Fixed, l1p0Fixed, l1p1Fixed, parallel]).solve();
 
@@ -400,7 +398,7 @@ test('basic pointOnLineMidpoint', function(t) {
   var l1p0Fixed = [constraints.fixed, [line[0]]];
   var l1p1Fixed = [constraints.fixed, [line[1]]];
 
-  var midpoint = [constraints.pointOnLineMidpoint, [point, line]]
+  var midpoint = [constraints.pointOnLineMidpoint, [point, line[0], line[1]]];
 
   var res = createSolver([l1p0Fixed, l1p1Fixed, midpoint]).solve();
 

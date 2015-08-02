@@ -18,6 +18,22 @@ function hypot() {
   return sqrt(y);
 }
 
+function injectPoints(orig, values) {
+  var l = orig.length;
+  var vwhere = 0;
+  for (var i=0; i<l; i++) {
+    orig[i][0] = values[vwhere++];
+    orig[i][1] = values[vwhere++];
+  }
+}
+
+function extractPoints(args, addComponent) {
+  var l = args.length;
+  for (var i=0; i<l; i++) {
+    addComponent(args[i], 0);
+    addComponent(args[i], 1);
+  }
+};
 
 function injectTwoLines(args, values) {
   var line1 = args[0];
@@ -63,16 +79,14 @@ function horizontalConstraint(y1, y2) {
 }
 
 horizontalConstraint.size = 2;
-
-horizontalConstraint.extract = function(args, addComponent) {
-  var line = args[0];
-  addComponent(line[0], 1)
-  addComponent(line[1], 1)
+horizontalConstraint.extract =  function(args, addComponent) {
+  addComponent(args[0], 1)
+  addComponent(args[1], 1)
 };
 
 horizontalConstraint.inject = function(orig, values) {
-  orig[0][0][1] = values[0];
-  orig[0][1][1] = values[1];
+  orig[0][1] = values[0];
+  orig[1][1] = values[1];
 }
 
 constraints.vertical = verticalConstraint;
@@ -85,14 +99,13 @@ function verticalConstraint(x1, x2) {
 verticalConstraint.size = 2;
 
 verticalConstraint.extract = function(args, addComponent) {
-  var line = args[0];
-  addComponent(line[0], 0)
-  addComponent(line[1], 0)
+  addComponent(args[0], 0)
+  addComponent(args[1], 0)
 };
 
 verticalConstraint.inject = function(orig, values) {
-  orig[0][0][0] = values[0];
-  orig[0][1][0] = values[1];
+  orig[0][0] = values[0];
+  orig[1][0] = values[1];
 }
 
 constraints.pointOnPoint = pointOnPoint;
@@ -105,20 +118,8 @@ function pointOnPoint(x1, y1, x2, y2) {
 }
 
 pointOnPoint.size = 4;
-pointOnPoint.extract = function(args, addComponent) {
-  addComponent(args[0], 0);
-  addComponent(args[0], 1);
-  addComponent(args[1], 0);
-  addComponent(args[1], 1);
-};
-
-pointOnPoint.inject = function(orig, values) {
-
-  orig[0][0] = values[0];
-  orig[0][1] = values[1];
-  orig[1][0] = values[2];
-  orig[1][1] = values[3];
-}
+pointOnPoint.extract = extractPoints
+pointOnPoint.inject = injectPoints;
 
 constraints.fixed = fixed;
 
@@ -166,9 +167,8 @@ pointOnLine.size = 6;
 
 pointOnLine.extract = function(args, addComponent) {
   var point = args[0]
-  var line = args[1];
-  var a = line[0];
-  var b = line[1];
+  var a = args[1];
+  var b = args[2];
 
   addComponent(point, 0)
   addComponent(point, 1)
@@ -179,11 +179,10 @@ pointOnLine.extract = function(args, addComponent) {
   addComponent(b, 1)
 };
 
-pointOnLine.inject = function(args, values) {
-  var point = args[0]
-  var line = args[1];
-  var a = line[0];
-  var b = line[1];
+pointOnLine.inject = function(orig, values) {
+  var point = orig[0]
+  var a = orig[1];
+  var b = orig[2];
 
   point[0] = values[0];
   point[1] = values[1];
@@ -220,12 +219,10 @@ internalAngle.size = 9;
 
 internalAngle.extract = function(args, addComponent) {
   var angle = args[0];
-  var line1 = args[1];
-  var line2 = args[2];
-  var a = line1[0];
-  var b = line1[1];
-  var c = line2[0];
-  var d = line2[1];
+  var a = args[1];
+  var b = args[2];
+  var c = args[3];
+  var d = args[4];
 
   addComponent(angle);
   addComponent(a, 0);
@@ -238,16 +235,15 @@ internalAngle.extract = function(args, addComponent) {
   addComponent(d, 1);
 };
 
-internalAngle.inject = function(args, values) {
-  var angle = args[0];
-  var line1 = args[1];
-  var line2 = args[2];
-  var a = line1[0];
-  var b = line1[1];
-  var c = line2[0];
-  var d = line2[1];
+internalAngle.inject = function(orig, values) {
+  var angle = orig[0];
+  var a = orig[1];
+  var b = orig[2];
+  var c = orig[3];
+  var d = orig[4];
 
-  args[0] = values[0];
+  // skip angle (index 0) as it's a constant
+
   a[0] = values[1];
   a[1] = values[2];
   b[0] = values[3];
@@ -266,8 +262,8 @@ function equalLength(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
 }
 
 equalLength.size = 8;
-equalLength.extract = extractTwoLines
-equalLength.inject = injectTwoLines;
+equalLength.extract = extractPoints
+equalLength.inject = injectPoints;
 
 module.exports.lineLength = lineLength;
 
@@ -280,9 +276,8 @@ lineLength.size = 5;
 
 lineLength.extract = function(args, addComponent) {
   var length = args[0];
-  var line1 = args[1];
-  var a = line1[0];
-  var b = line1[1];
+  var a = args[1];
+  var b = args[2];
 
   addComponent(length);
   addComponent(a, 0);
@@ -291,11 +286,11 @@ lineLength.extract = function(args, addComponent) {
   addComponent(b, 1);
 };
 
-lineLength.inject = function(args, values) {
-  var line1 = args[1];
-  var a = line1[0];
-  var b = line1[1];
-  args[0] = values[0];
+lineLength.inject = function(orig, values) {
+  // skip injecting `length` because it is a constant
+
+  var a = orig[1];
+  var b = orig[2];
 
   a[0] = values[1];
   a[1] = values[2];
@@ -322,9 +317,8 @@ symmetricPoints.size = 8;
 symmetricPoints.extract = function(args, addComponent) {
   var p1 = args[0];
   var p2 = args[1];
-  var line = args[2];
-  var a = line[0];
-  var b = line[1];
+  var a = args[2];
+  var b = args[3];
 
   addComponent(p1, 0);
   addComponent(p1, 1);
@@ -336,12 +330,11 @@ symmetricPoints.extract = function(args, addComponent) {
   addComponent(b, 1);
 };
 
-symmetricPoints.inject = function(args, values) {
-  var p1 = args[0];
-  var p2 = args[1];
-  var line = args[2];
-  var a = line[0];
-  var b = line[1];
+symmetricPoints.inject = function(orig, values) {
+  var p1 = orig[0];
+  var p2 = orig[1];
+  var a = orig[2];
+  var b = orig[3];
 
   p1[0] = values[0];
   p1[1] = values[1];
@@ -411,8 +404,8 @@ function perpendicular(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
 }
 
 perpendicular.size = 8;
-perpendicular.extract = extractTwoLines;
-perpendicular.inject = injectTwoLines;
+perpendicular.extract = extractPoints;
+perpendicular.inject = injectPoints;
 
 module.exports.parallel = parallel;
 
@@ -424,24 +417,13 @@ function parallel(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
 
   var r = dx1 * dy2 - dy1 * dx2
   return r * r;
-  // var hypotenuse1 = hypot(dx1, dy1);
-  // var hypotenuse2 = hypot(dx2, dy2);
-
-  // dx1 /= hypotenuse1;
-  // dy1 /= hypotenuse1;
-  // dx2 /= hypotenuse2;
-  // dy2 /= hypotenuse2;
-
-  // var r = dx1 * dx2 - dy1 * dy2;
-  // return r * r;
 }
 
 parallel.size = 8;
-parallel.extract = extractTwoLines;
-parallel.inject = injectTwoLines;
+parallel.extract = extractPoints;
+parallel.inject = injectPoints;
 
 module.exports.colinear = colinear;
-
 function colinear(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
   var dx = l1ex - l1sx;
   var dy = l1ey - l1sy;
@@ -465,16 +447,14 @@ function colinear(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
     r = ex1 * ex1 + ex2 * ex2;
   }
   return r;
-
 }
 
 colinear.size = 8;
-colinear.extract = extractTwoLines;
-colinear.inject = injectTwoLines;
+colinear.extract = extractPoints;
+colinear.inject = injectPoints;
 
 
 constraints.pointOnLineMidpoint = pointOnLineMidpoint;
-
 function pointOnLineMidpoint(px, py, x1, y1, x2, y2) {
   var mx = pow((x1 + x2) / 2 - px, 2);
   var my = pow((y1 + y2) / 2 - py, 2);
@@ -485,9 +465,8 @@ pointOnLineMidpoint.size = 6;
 
 pointOnLineMidpoint.extract = function(args, addComponent) {
   var point = args[0]
-  var line = args[1];
-  var a = line[0];
-  var b = line[1];
+  var a = args[1];
+  var b = args[2];
 
   addComponent(point, 0)
   addComponent(point, 1)
@@ -498,11 +477,10 @@ pointOnLineMidpoint.extract = function(args, addComponent) {
   addComponent(b, 1)
 };
 
-pointOnLineMidpoint.inject = function(args, values) {
-  var point = args[0]
-  var line = args[1];
-  var a = line[0];
-  var b = line[1];
+pointOnLineMidpoint.inject = function(orig, values) {
+  var point = orig[0];
+  var a = orig[1];
+  var b = orig[2];
 
   point[0] = values[0];
   point[1] = values[1];
