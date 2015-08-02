@@ -77,6 +77,20 @@ ConstraintManager.prototype.remove = function(constraint) {
   });
 }
 
+ConstraintManager.prototype.isPointFixed = function(point) {
+  var constraints = this.constraints;
+  var l = constraints.length;
+  for (var i=0; i<l; i++) {
+    var constraint = constraints[i];
+    if (constraint[0].name === 'fixed') {
+      if (constraint[1].indexOf(point) > -1) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 ConstraintManager.prototype.solve = function solve() {
   var manager = this;
 
@@ -102,16 +116,12 @@ ConstraintManager.prototype.solve = function solve() {
 
     fn.extract(constraint[1], function addComponent(point, key) {
       // TODO: make this more efficient..
-      var r = fixedPoints.filter(function(a) {
-        if (a === point) {
-          return true;
-        }
-      })
+      var fixed = fixedPoints.indexOf(point) > -1;
 
       var constant = typeof key === 'undefined'
       var value = (constant) ? point : point[key];
 
-      if (r.length || constant) {
+      if (fixed || constant) {
         variables.push(value);
       } else {
         var valueIndex = components.length;

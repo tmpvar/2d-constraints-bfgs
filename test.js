@@ -71,21 +71,6 @@ test('basic pointOnPoint test', function(t) {
   t.end();
 });
 
-test('basic pointOnPoint', function(t) {
-  var point1 = [0, 0];
-  var point2 = [1, 1];
-
-  var pointOnPoint = [constraints.pointOnPoint, [point1, point2]];
-  var res = createSolver([pointOnPoint]).solve();
-
-  t.ok(res, 'found a solution');
-  t.ok(near(point1[0], 0.5), 'point1 x near 0.5');
-  t.ok(near(point1[1], 0.5), 'point1 y near 0.5');
-  t.ok(near(point2[0], 0.5), 'point2 x near 0.5');
-  t.ok(near(point2[1], 0.5), 'point2 y near 0.5');
-  t.end();
-});
-
 test('basic pointOnPoint w/ fixed point', function(t) {
   var point1 = [0, 0];
   var point2 = [1, 1];
@@ -426,3 +411,17 @@ test('basic pointOnLineMidpoint', function(t) {
 
   t.end();
 });
+
+test('ConstraintManager#isPointFixed', function(t) {
+  var fixedPoint = [0, 0];
+  var notFixed = [1, 1];
+
+  var s = createSolver([
+    [constraints.fixed, [fixedPoint]],
+    [constraints.pointOnPoint, [notFixed, fixedPoint]],
+  ])
+
+  t.ok(s.isPointFixed(fixedPoint), 'fixedPoint is fixed')
+  t.notOk(s.isPointFixed(notFixed), 'notFixed is not fixed')
+  t.end();
+})
