@@ -42,6 +42,7 @@ function horizontalConstraint(y1, y2) {
   return ydiff * ydiff * 1000;
 }
 
+horizontalConstraint.args = ['point', 'point'];
 horizontalConstraint.size = 2;
 horizontalConstraint.extract =  function(args, addComponent) {
   addComponent(args[0], 1);
@@ -60,8 +61,8 @@ function verticalConstraint(x1, x2) {
   return xdiff * xdiff * 1000;
 }
 
+verticalConstraint.args = ['point', 'point'];
 verticalConstraint.size = 2;
-
 verticalConstraint.extract = function(args, addComponent) {
   addComponent(args[0], 0);
   addComponent(args[1], 0);
@@ -81,15 +82,19 @@ function pointOnPoint(x1, y1, x2, y2) {
   return dx * dx + dy * dy;
 }
 
+pointOnPoint.args = ['point', 'point'];
 pointOnPoint.size = 4;
 pointOnPoint.extract = extractPoints;
 pointOnPoint.inject = injectPoints;
 
-constraints.fixed = fixed;
 
+constraints.fixed = fixed;
 function fixed(px, py, ox, oy) {
   // placeholder, fixed is filtered out before solve
 }
+fixed.size = 2;
+fixed.args = ['point'];
+
 
 constraints.pointOnLine = pointOnLine;
 
@@ -113,8 +118,8 @@ function pointOnLine(px, py, x1, y1, x2, y2) {
   }
 }
 
+pointOnLine.args = ['point', 'point', 'point', 'point'];
 pointOnLine.size = 6;
-
 pointOnLine.extract = function(args, addComponent) {
   var point = args[0];
   var a = args[1];
@@ -165,8 +170,8 @@ function internalAngle(angle, l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
   return (temp + temp2) * (temp + temp2);
 }
 
+internalAngle.args = ['float', 'point', 'point', 'point', 'point'];
 internalAngle.size = 9;
-
 internalAngle.extract = function(args, addComponent) {
   var angle = args[0];
   var a = args[1];
@@ -211,6 +216,7 @@ function equalLength(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
   return r * r;
 }
 
+equalLength.args = ['point', 'point', 'point', 'point'];
 equalLength.size = 8;
 equalLength.extract = extractPoints;
 equalLength.inject = injectPoints;
@@ -222,8 +228,8 @@ function lineLength(length, l1sx, l1sy, l1ex, l1ey) {
   return r * r;
 }
 
+lineLength.args = ['float', 'point', 'point'];
 lineLength.size = 5;
-
 lineLength.extract = function(args, addComponent) {
   var length = args[0];
   var a = args[1];
@@ -262,8 +268,8 @@ function symmetricPoints(p1x, p1y, p2x, p2y, l1sx, l1sy, l1ex, l1ey) {
   return tx * tx + ty * ty;
 }
 
+symmetricPoints.args = ['point', 'point', 'point', 'point'];
 symmetricPoints.size = 8;
-
 symmetricPoints.extract = function(args, addComponent) {
   var p1 = args[0];
   var p2 = args[1];
@@ -306,8 +312,9 @@ function pointToPointDistance(distance, p1x, p1y, p2x, p2y) {
   return  r*r;
 }
 
+pointToPointDistance.args = ['float', 'point', 'point'];
+// TODO: this count is wrong!
 pointToPointDistance.size = 4;
-
 pointToPointDistance.extract = function(args, addComponent) {
   var distance = args[0];
   var p1 = args[1];
@@ -353,6 +360,7 @@ function perpendicular(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
   return r * r;
 }
 
+perpendicular.args = ['point', 'point', 'point', 'point'];
 perpendicular.size = 8;
 perpendicular.extract = extractPoints;
 perpendicular.inject = injectPoints;
@@ -369,6 +377,7 @@ function parallel(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
   return r * r;
 }
 
+parallel.args = ['point', 'point', 'point', 'point'];
 parallel.size = 8;
 parallel.extract = extractPoints;
 parallel.inject = injectPoints;
@@ -399,6 +408,7 @@ function colinear(l1sx, l1sy, l1ex, l1ey, l2sx, l2sy, l2ex, l2ey) {
   return r;
 }
 
+colinear.args = ['point', 'point', 'point', 'point'];
 colinear.size = 8;
 colinear.extract = extractPoints;
 colinear.inject = injectPoints;
@@ -411,8 +421,8 @@ function pointOnLineMidpoint(px, py, x1, y1, x2, y2) {
   return mx + my;
 }
 
+pointOnLineMidpoint.args = ['point', 'point', 'point'];
 pointOnLineMidpoint.size = 6;
-
 pointOnLineMidpoint.extract = function(args, addComponent) {
   var point = args[0];
   var a = args[1];
