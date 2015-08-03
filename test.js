@@ -19,6 +19,25 @@ function distance(a, b) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+test('solver with no constraints', function(t) {
+  var s = createSolver();
+  var r = s.solve();
+  t.ok(r, 'nothing to solve');
+  t.end();
+});
+
+test('solver add/remove constraint', function(t) {
+  var s = createSolver();
+  var i = [1]
+
+  s.add(i);
+  t.equal(s.constraints.length,  1, 'one constraint')
+  s.remove(i);
+  t.equal(s.constraints.length,  0, 'zero constraints')
+  t.end();
+});
+
+
 test('basic horizontal test', function(t) {
   var line = [
     [0, 0],
@@ -110,7 +129,7 @@ test('basic pointOnLine test', function(t) {
   t.end();
 });
 
-test('basic pointOnLine test with fixed points', function(t) {
+test('basic pointOnLine test with fixed points (horizontal)', function(t) {
   var point = [.5, 1];
 
   var line = [
@@ -130,6 +149,30 @@ test('basic pointOnLine test with fixed points', function(t) {
   t.deepEqual(line, [
     [0, 0],
     [1, 0]
+  ], 'line did not move')
+  t.end();
+});
+
+test('basic pointOnLine test with fixed points (vertical)', function(t) {
+  var point = [1, .5];
+
+  var line = [
+    [0, 0],
+    [0, 1]
+  ];
+
+  var pointOnLine = [constraints.pointOnLine, [point, line[0], line[1]]];
+  var l1p0Fixed = [constraints.fixed, [line[0]]];
+  var l1p1Fixed = [constraints.fixed, [line[1]]];
+
+  var res = createSolver([pointOnLine, l1p0Fixed, l1p1Fixed]).solve();
+
+  t.ok(res, 'found a solution');
+  t.ok(near(point[0], 0), 'point1 x near 0.5');
+  t.ok(near(point[1], 0.5), 'point1 y near 0.0');
+  t.deepEqual(line, [
+    [0, 0],
+    [0, 1]
   ], 'line did not move')
   t.end();
 });
