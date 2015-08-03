@@ -35,42 +35,6 @@ function extractPoints(args, addComponent) {
   }
 }
 
-function injectTwoLines(args, values) {
-  var line1 = args[0];
-  var line2 = args[1];
-  var a = line1[0];
-  var b = line1[1];
-  var c = line2[0];
-  var d = line2[1];
-
-  a[0] = values[0];
-  a[1] = values[1];
-  b[0] = values[2];
-  b[1] = values[3];
-  c[0] = values[4];
-  c[1] = values[5];
-  d[0] = values[6];
-  d[1] = values[7];
-}
-
-function extractTwoLines(args, addComponent) {
-  var line1 = args[0];
-  var line2 = args[1];
-  var a = line1[0];
-  var b = line1[1];
-  var c = line2[0];
-  var d = line2[1];
-
-  addComponent(a, 0);
-  addComponent(a, 1);
-  addComponent(b, 0);
-  addComponent(b, 1);
-  addComponent(c, 0);
-  addComponent(c, 1);
-  addComponent(d, 0);
-  addComponent(d, 1);
-}
-
 constraints.horizontal = horizontalConstraint;
 
 function horizontalConstraint(y1, y2) {
