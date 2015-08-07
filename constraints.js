@@ -35,40 +35,40 @@ function extractPoints(args, addComponent) {
   }
 }
 
-constraints.horizontal = horizontalConstraint;
+constraints.horizontal = horizontal;
 
-function horizontalConstraint(y1, y2) {
+function horizontal(y1, y2) {
   var ydiff = y2 - y1;
   return ydiff * ydiff * 1000;
 }
 
-horizontalConstraint.args = ['point', 'point'];
-horizontalConstraint.size = 2;
-horizontalConstraint.extract =  function(args, addComponent) {
+horizontal.args = ['point', 'point'];
+horizontal.size = 2;
+horizontal.extract =  function(args, addComponent) {
   addComponent(args[0], 1);
   addComponent(args[1], 1);
 };
 
-horizontalConstraint.inject = function(orig, values) {
+horizontal.inject = function(orig, values) {
   orig[0][1] = values[0];
   orig[1][1] = values[1];
 };
 
-constraints.vertical = verticalConstraint;
+constraints.vertical = vertical;
 
-function verticalConstraint(x1, x2) {
+function vertical(x1, x2) {
   var xdiff = x2 - x1;
   return xdiff * xdiff * 1000;
 }
 
-verticalConstraint.args = ['point', 'point'];
-verticalConstraint.size = 2;
-verticalConstraint.extract = function(args, addComponent) {
+vertical.args = ['point', 'point'];
+vertical.size = 2;
+vertical.extract = function(args, addComponent) {
   addComponent(args[0], 0);
   addComponent(args[1], 0);
 };
 
-verticalConstraint.inject = function(orig, values) {
+vertical.inject = function(orig, values) {
   orig[0][0] = values[0];
   orig[1][0] = values[1];
 };
